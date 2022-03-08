@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -15,14 +16,16 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.Map;
 
 import Models.Event;
+import Models.Person;
 
 public class MapsFragment extends Fragment {
-
+    private TextView detailedView;
     private final OnMapReadyCallback callback = new OnMapReadyCallback() {
 
         /**
@@ -38,7 +41,7 @@ public class MapsFragment extends Fragment {
         public void onMapReady(GoogleMap googleMap) {
             for(Map.Entry<String, Event> eventEntry : DataCache.getInstance().getEvents().entrySet()) {
                 float color;
-                float zIndex;
+                //float zIndex;
                 switch (eventEntry.getValue().getEventType()) {
                     case "Birth":
                         color = BitmapDescriptorFactory.HUE_MAGENTA;
@@ -53,17 +56,40 @@ public class MapsFragment extends Fragment {
                         color = BitmapDescriptorFactory.HUE_CYAN;
                         break;
                 }
-                googleMap.addMarker(new MarkerOptions().position(new LatLng(eventEntry.getValue().getLatitude(), eventEntry.getValue().getLongitude())).icon(BitmapDescriptorFactory.defaultMarker(color)));
+
+                Event currentEvent = eventEntry.getValue();
+                Person currentPerson = DataCache.getInstance().getFamilyPeople().get(currentEvent.getPersonID());
+
+                assert currentPerson != null;
+                String markerTitle = currentPerson.getFirstName() + " " + currentPerson.getLastName() + "\n"
+                        + currentEvent.getEventType().toUpperCase() + ": " + currentEvent.getCity() + ", " +
+                        currentEvent.getCountry() + " (" + currentEvent.getYear() + ")";
+
+                googleMap.addMarker(new MarkerOptions().position(new LatLng(eventEntry.getValue().getLatitude(),
+                        eventEntry.getValue().getLongitude())).icon(BitmapDescriptorFactory.defaultMarker(color)).title(markerTitle));
+
+                googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(@NonNull Marker marker) {
+                        detailedView.setText(marker.getTitle());
+                        System.out.println(marker.getTitle());
+                        return true;
+                    }
+                });
             }
         }
     };
+
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_maps, container, false);
+        View view = inflater.inflate(R.layout.fragment_maps, container, false);
+        detailedView =  view.findViewById(R.id.markerInfo);
+        return view;
+        //return inflater.inflate(R.layout.fragment_maps, container, false);
     }
 
     @Override
