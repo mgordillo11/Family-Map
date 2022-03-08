@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="16dp"
+        android:stretchColumns="2"
+        tools:context=".LoginFragment">
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/serverHost"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/server_host" />
+
+            <EditText
+                android:id="@+id/serverHostInput"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_span="2"
+                android:inputType="text"
+                tools:text="Test-Server-Host" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/serverPort"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/server_port" />
+
+            <EditText
+                android:id="@+id/serverPortInput"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_span="2"
+                android:inputType="text"
+                tools:text="Test-Server-Port" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/userName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/user_name" />
+
+            <EditText
+                android:id="@+id/userNameInput"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_span="2"
+                android:inputType="text"
+                tools:text="Test-User" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/password"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/password" />
+
+            <EditText
+                android:id="@+id/passwordInput"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_span="2"
+                android:inputType="textPassword"
+                tools:text="Test-Password" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/firstName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/first_name" />
+
+            <EditText
+                android:id="@+id/firstNameInput"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_span="2"
+                android:inputType="textPersonName"
+                tools:text="Test-Firstname" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/lastName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/last_name" />
+
+            <EditText
+                android:id="@+id/lastNameInput"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_span="2"
+                android:inputType="textPersonName"
+                tools:text="Test-Lastname" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/email" />
+
+            <EditText
+                android:id="@+id/emailInput"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_span="2"
+                android:inputType="textEmailAddress"
+                tools:text="Test-Email" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/genderButtons"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="13dp"
+                android:text="@string/gender" />
+
+            <RadioGroup
+                android:id="@+id/maleFemaleButtons"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/maleButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/male" />
+
+                <RadioButton
+                    android:id="@+id/femaleButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/female" />
+            </RadioGroup>
+        </TableRow>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+
+            android:orientation="horizontal"
+            android:paddingTop="20dp">
+
+            <Button
+                android:id="@+id/signInButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:text="@string/sign_in_button"
+                android:enabled="false"/>
+
+            <Button
+                android:id="@+id/registerButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/register_button"
+                android:enabled="false"/>
+        </LinearLayout>
+
+
+    </TableLayout>
+</ScrollView>
