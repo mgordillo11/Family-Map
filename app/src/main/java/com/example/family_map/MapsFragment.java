@@ -1,16 +1,16 @@
 package com.example.family_map;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -20,12 +20,16 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.Map;
+import java.util.Vector;
 
 import Models.Event;
 import Models.Person;
 
 public class MapsFragment extends Fragment {
     private TextView detailedView;
+    private String currentPersonID;
+    private String currentGender;
+
     private final OnMapReadyCallback callback = new OnMapReadyCallback() {
 
         /**
@@ -60,19 +64,32 @@ public class MapsFragment extends Fragment {
                 Event currentEvent = eventEntry.getValue();
                 Person currentPerson = DataCache.getInstance().getFamilyPeople().get(currentEvent.getPersonID());
 
-                assert currentPerson != null;
+                Vector<String> markerInfo = new Vector<>();
+                markerInfo.add(0, currentEvent.getPersonID());
+                markerInfo.add(1, currentPerson.getGender());
+
                 String markerTitle = currentPerson.getFirstName() + " " + currentPerson.getLastName() + "\n"
                         + currentEvent.getEventType().toUpperCase() + ": " + currentEvent.getCity() + ", " +
                         currentEvent.getCountry() + " (" + currentEvent.getYear() + ")";
 
                 googleMap.addMarker(new MarkerOptions().position(new LatLng(eventEntry.getValue().getLatitude(),
-                        eventEntry.getValue().getLongitude())).icon(BitmapDescriptorFactory.defaultMarker(color)).title(markerTitle));
+                        eventEntry.getValue().getLongitude())).icon(BitmapDescriptorFactory.defaultMarker(color)).title(markerTitle)).setTag(markerInfo);
 
                 googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(@NonNull Marker marker) {
+                        Vector<String> markerData = (Vector<String>) marker.getTag();
+
+                        currentPersonID = markerData.get(0);
+                        currentGender = markerData.get(1);
+
+                        if(currentGender.equals("m")) {
+                            detailedView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.baseline_man_24, 0, 0);
+                        } else {
+                            detailedView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.baseline_woman_24, 0, 0);
+                        }
+
                         detailedView.setText(marker.getTitle());
-                        System.out.println(marker.getTitle());
                         return true;
                     }
                 });
@@ -88,6 +105,15 @@ public class MapsFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
         detailedView =  view.findViewById(R.id.markerInfo);
+
+        detailedView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(view.getContext(), PersonActivity.class);
+                intent.putExtra("personID", currentPersonID);
+                startActivity(intent);
+            }
+        });
         return view;
         //return inflater.inflate(R.layout.fragment_maps, container, false);
     }

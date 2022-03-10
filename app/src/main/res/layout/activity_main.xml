@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--<androidx.constraintlayout.widget.ConstraintLayout-->
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -17,4 +16,3 @@
         tools:layout_editor_absoluteX="201dp"
         tools:layout_editor_absoluteY="111dp" />
 </ScrollView>
-<!--</androidx.constraintlayout.widget.ConstraintLayout>-->
