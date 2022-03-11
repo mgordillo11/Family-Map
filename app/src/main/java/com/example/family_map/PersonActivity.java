@@ -195,12 +195,20 @@ public class PersonActivity extends AppCompatActivity {
             String eventItemText = itemEvent.getEventType().toUpperCase() + ": " + itemEvent.getCity() + "," + itemEvent.getCountry()
                     + "(" + itemEvent.getYear() + ")\n" + actualFirstName.getText().toString() + " " + actualLastName.getText().toString();
 
+            String newEventActivityInfo =  actualFirstName.getText().toString() + " " + actualLastName.getText().toString() +
+                    "\n" + itemEvent.getEventType().toUpperCase() + ": " + itemEvent.getCity() + "," + itemEvent.getCountry()
+                    + "(" + itemEvent.getYear() + ")";
+
             eventItemView.setText(eventItemText);
 
             lifeEventItemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Toast.makeText(PersonActivity.this, "Event Item Click Working", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(PersonActivity.this, "Event Item Click Working", Toast.LENGTH_SHORT).show();
+                    Intent eventIntent = new Intent(PersonActivity.this, EventActivity.class);
+                    eventIntent.putExtra("eventID", itemEvent.getEventID());
+                    eventIntent.putExtra("eventInfo", newEventActivityInfo);
+                    startActivity(eventIntent);
                 }
             });
         }

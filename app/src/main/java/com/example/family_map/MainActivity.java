@@ -13,7 +13,6 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
         setContentView(R.layout.activity_main);
 
         FragmentManager fragmentManager = this.getSupportFragmentManager();
-        //LoginFragment loginFragment = new LoginFragment();
         Fragment loginFragment = fragmentManager.findFragmentById(R.id.loginFragment);
 
         if(loginFragment == null) {
@@ -30,6 +29,6 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
     public void notifyDone() {
         FragmentManager fragmentManager = this.getSupportFragmentManager();
         Fragment mapsFragment = new MapsFragment();
-        fragmentManager.beginTransaction().add(R.id.loginFragment, mapsFragment).commit();
+        fragmentManager.beginTransaction().replace(R.id.loginFragment, mapsFragment).commit();
     }
 }

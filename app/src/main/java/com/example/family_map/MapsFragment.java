@@ -11,6 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -18,7 +20,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -29,6 +33,12 @@ public class MapsFragment extends Fragment {
     private TextView detailedView;
     private String currentPersonID;
     private String currentGender;
+    private String eventID;
+    private String zoomedEvent;
+
+    public void setEventID(String eventID) {
+        this.eventID = eventID;
+    }
 
     private final OnMapReadyCallback callback = new OnMapReadyCallback() {
 
@@ -43,9 +53,8 @@ public class MapsFragment extends Fragment {
          */
         @Override
         public void onMapReady(GoogleMap googleMap) {
-            for(Map.Entry<String, Event> eventEntry : DataCache.getInstance().getEvents().entrySet()) {
+            for (Map.Entry<String, Event> eventEntry : DataCache.getInstance().getEvents().entrySet()) {
                 float color;
-                //float zIndex;
                 switch (eventEntry.getValue().getEventType()) {
                     case "Birth":
                         color = BitmapDescriptorFactory.HUE_MAGENTA;
@@ -67,6 +76,7 @@ public class MapsFragment extends Fragment {
                 Vector<String> markerInfo = new Vector<>();
                 markerInfo.add(0, currentEvent.getPersonID());
                 markerInfo.add(1, currentPerson.getGender());
+                markerInfo.add(2, currentEvent.getEventID());
 
                 String markerTitle = currentPerson.getFirstName() + " " + currentPerson.getLastName() + "\n"
                         + currentEvent.getEventType().toUpperCase() + ": " + currentEvent.getCity() + ", " +
@@ -83,10 +93,39 @@ public class MapsFragment extends Fragment {
                         currentPersonID = markerData.get(0);
                         currentGender = markerData.get(1);
 
-                        if(currentGender.equals("m")) {
+                        if (currentGender.equals("m")) {
                             detailedView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.baseline_man_24, 0, 0);
                         } else {
                             detailedView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.baseline_woman_24, 0, 0);
+                        }
+
+                        Event clickedMarkerEvent = DataCache.getInstance().getEvents().get(markerInfo.get(2));
+
+                        Person currentPerson = DataCache.getInstance().getFamilyPeople().get(currentPersonID);
+                        Person currentSpouse = null;
+
+                        for (Map.Entry<String, Person> spouseSearch : DataCache.getInstance().getFamilyPeople().entrySet()) {
+                            assert currentPerson != null;
+                            if (spouseSearch.getValue().getPersonID().equals(currentPerson.getSpouseID())) {
+                                currentSpouse = spouseSearch.getValue();
+                            }
+                        }
+
+                        if (currentSpouse != null) {
+                            //Event personEarliestEvent = DataCache.getInstance().getPersonEvents().get(currentPerson.getPersonID()).get(0);
+                            Event spouseEarliestEvent = null;
+                            List<Event> spouseEvents = DataCache.getInstance().getPersonEvents().get(currentSpouse.getPersonID());
+                            for(int i = 0; i < spouseEvents.size(); i++) {
+                                if(spouseEvents.get(i).getEventType().equals("Birth")) {
+                                    spouseEarliestEvent = spouseEvents.get(i);
+                                    break;
+                                }
+                            }
+
+                            LatLng spouseLatLng = new LatLng(spouseEarliestEvent.getLatitude(), spouseEarliestEvent.getLongitude());
+                            LatLng personLatLng = new LatLng(clickedMarkerEvent.getLatitude(), clickedMarkerEvent.getLongitude());
+
+                            googleMap.addPolyline(new PolylineOptions().clickable(false).add(personLatLng, spouseLatLng));
                         }
 
                         detailedView.setText(marker.getTitle());
@@ -94,9 +133,18 @@ public class MapsFragment extends Fragment {
                     }
                 });
             }
+
+            if (eventID != null) {
+                Event markerPressedEvent = DataCache.getInstance().getEvents().get(eventID);
+
+                assert markerPressedEvent != null;
+                LatLng markerLocation = new LatLng(markerPressedEvent.getLatitude(), markerPressedEvent.getLongitude());
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(markerLocation, 10));
+
+                detailedView.setText(zoomedEvent);
+            }
         }
     };
-
 
     @Nullable
     @Override
@@ -104,12 +152,17 @@ public class MapsFragment extends Fragment {
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
-        detailedView =  view.findViewById(R.id.markerInfo);
+        detailedView = view.findViewById(R.id.markerInfo);
 
-        detailedView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(view.getContext(), PersonActivity.class);
+
+        if (getArguments() != null) {
+            eventID = getArguments().getString("eventID");
+            zoomedEvent = getArguments().getString("eventInfo");
+        }
+
+        detailedView.setOnClickListener(detailedView -> {
+            if (currentPersonID != null) {
+                Intent intent = new Intent(detailedView.getContext(), PersonActivity.class);
                 intent.putExtra("personID", currentPersonID);
                 startActivity(intent);
             }
