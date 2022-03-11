@@ -31,7 +31,7 @@ public class DataCache {
     private Map<String, Event> familyEvents; //Get an event based on their event ID
 
     private Map<String, List<Event>> personEvents; //Get a list of events chronologically based on a person's ID
-    private Map<String, List<Person>> userFamily;
+    private Map<String, List<Person>> userFamily; //Get a list of family based on a person's ID
 
     private Set<String> paternalAncestors; //Get ancestors on dad's side
     private Set<String> maternalAncestors; //Get ancestor's on mom's side
@@ -74,10 +74,15 @@ public class DataCache {
     public void setFamilyPeople(Map<String, Person> familyPeople) {
         this.familyPeople = familyPeople;
     }
-// Settings settings  (Class for future assignments)
 
-    //APPROACH #1 - STATIC CLASS
-    //static Map<String personID, Person> people;
-    //static Map<String eventID, Event> events;
-    //static List<Event> getEventsForPerson(personID) {}
+    public Person getChildFromParent(String parentID) {
+        for (Map.Entry<String, Person> entry : getFamilyPeople().entrySet()) {
+            if(entry.getValue().getFatherID() != null && entry.getValue().getMotherID() != null)  {
+                if(entry.getValue().getFatherID().equals(parentID) || entry.getValue().getMotherID().equals(parentID)) {
+                    return entry.getValue();
+                }
+            }
+        }
+        return null;
+    }
 }

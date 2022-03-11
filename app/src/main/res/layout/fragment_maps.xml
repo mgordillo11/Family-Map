@@ -21,10 +21,9 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_margin="20dp"
         android:text="@string/eventMarkerDefault"
         android:textAlignment="center"
         android:textSize="20sp"
-        app:drawableTopCompat="@drawable/baseline_man_24" />
+        app:drawableTopCompat="@drawable/outline_person_24" />
 
 </LinearLayout>

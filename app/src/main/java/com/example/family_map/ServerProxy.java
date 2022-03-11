@@ -172,7 +172,6 @@ public class ServerProxy { //ServerFacade nickname
 
                 for (Person currentPerson : personResponse.getData()) {
                     DataCache.getInstance().getFamilyPeople().put(currentPerson.getPersonID(), currentPerson);
-
                     if (!DataCache.getInstance().getUserFamily().containsKey(currentPerson.getAssociatedUsername())) {
                         List<Person> personList = new ArrayList<>();
                         DataCache.getInstance().getUserFamily().put(currentPerson.getAssociatedUsername(), personList);
@@ -221,13 +220,12 @@ public class ServerProxy { //ServerFacade nickname
 
                 for (Event currentEvent : eventResponse.getData()) {
                     DataCache.getInstance().getEvents().put(currentEvent.getEventID(), currentEvent);
-                    if (!(DataCache.getInstance().getPersonEvents().containsKey(currentEvent.getAssociatedUsername()))) {
+                    if (!(DataCache.getInstance().getPersonEvents().containsKey(currentEvent.getPersonID()))) {
                         List<Event> userEvents = new ArrayList<>();
-                        DataCache.getInstance().getPersonEvents().put(currentEvent.getAssociatedUsername(), userEvents);
+                        DataCache.getInstance().getPersonEvents().put(currentEvent.getPersonID(), userEvents);
                     }
-                    DataCache.getInstance().getPersonEvents().get(currentEvent.getAssociatedUsername()).add(currentEvent);
+                    DataCache.getInstance().getPersonEvents().get(currentEvent.getPersonID()).add(currentEvent);
                 }
-
                 return true;
             } else {
                 System.out.println("ERROR: " + httpURLConnection.getResponseMessage());
