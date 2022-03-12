@@ -1,0 +1,49 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory app:title="@string/settings_header">
+
+        <SwitchPreferenceCompat
+            app:key="life_story_lines"
+            app:summaryOff="@string/show_life_story_lines"
+            app:summaryOn="@string/show_life_story_lines"
+            app:title="@string/life_story_lines_header" />
+
+        <SwitchPreferenceCompat
+            app:key="family_tree_lines"
+            app:summaryOff="@string/show_family_tree_lines_header"
+            app:summaryOn="@string/show_family_tree_lines_header"
+            app:title="@string/family_tree_lines_header" />
+
+
+        <SwitchPreferenceCompat
+            app:key="spouse_lines"
+            app:summaryOff="@string/show_spouse_lines_header"
+            app:summaryOn="@string/show_spouse_lines_header"
+            app:title="@string/spouse_lines_header" />
+
+        <SwitchPreferenceCompat
+            app:key="father_side"
+            app:summaryOff="@string/filter_father_side_header"
+            app:summaryOn="@string/filter_father_side_header"
+            app:title="@string/father_side_header" />
+
+        <SwitchPreferenceCompat
+            app:key="mother_side"
+            app:summaryOff="@string/filter_mother_side_header"
+            app:summaryOn="@string/filter_mother_side_header"
+            app:title="@string/mother_side_header" />
+
+        <SwitchPreferenceCompat
+            app:key="male_events"
+            app:summaryOff="@string/filter_gender_events_header"
+            app:summaryOn="@string/filter_gender_events_header"
+            app:title="@string/male_events_header" />
+
+        <SwitchPreferenceCompat
+            app:key="female_events"
+            app:summaryOff="@string/filter_gender_events_header"
+            app:summaryOn="@string/filter_gender_events_header"
+            app:title="@string/female_events_header" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

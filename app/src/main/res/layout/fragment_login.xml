@@ -26,8 +26,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_span="2"
-                android:inputType="text"
-                tools:text="Test-Server-Host" />
+                android:text="localhost"
+                android:inputType="text" />
         </TableRow>
 
         <TableRow>
@@ -44,7 +44,7 @@
                 android:layout_height="wrap_content"
                 android:layout_span="2"
                 android:inputType="text"
-                tools:text="Test-Server-Port" />
+                android:text="8080"/>
         </TableRow>
 
         <TableRow>
@@ -61,6 +61,7 @@
                 android:layout_height="wrap_content"
                 android:layout_span="2"
                 android:inputType="text"
+                android:text="Manny"
                 tools:text="Test-User" />
         </TableRow>
 
@@ -78,6 +79,7 @@
                 android:layout_height="wrap_content"
                 android:layout_span="2"
                 android:inputType="textPassword"
+                android:text="p"
                 tools:text="Test-Password" />
         </TableRow>
 

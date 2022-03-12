@@ -8,8 +8,8 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.LinkedList;
@@ -26,6 +26,12 @@ public class PersonActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_person);
+
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         actualFirstName = findViewById(R.id.actualPersonFirstName);
         actualLastName = findViewById(R.id.actualPersonLastName);
@@ -195,7 +201,7 @@ public class PersonActivity extends AppCompatActivity {
             String eventItemText = itemEvent.getEventType().toUpperCase() + ": " + itemEvent.getCity() + "," + itemEvent.getCountry()
                     + "(" + itemEvent.getYear() + ")\n" + actualFirstName.getText().toString() + " " + actualLastName.getText().toString();
 
-            String newEventActivityInfo =  actualFirstName.getText().toString() + " " + actualLastName.getText().toString() +
+            String newEventActivityInfo = actualFirstName.getText().toString() + " " + actualLastName.getText().toString() +
                     "\n" + itemEvent.getEventType().toUpperCase() + ": " + itemEvent.getCity() + "," + itemEvent.getCountry()
                     + "(" + itemEvent.getYear() + ")";
 
@@ -235,7 +241,7 @@ public class PersonActivity extends AppCompatActivity {
             familyItemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if(currentFamilyMember != null) {
+                    if (currentFamilyMember != null) {
                         Intent personIntent = new Intent(PersonActivity.this, PersonActivity.class);
                         personIntent.putExtra("personID", familyTree.get(childPosition).second.getPersonID());
                         startActivity(personIntent);

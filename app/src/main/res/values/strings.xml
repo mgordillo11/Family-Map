@@ -17,4 +17,46 @@
     <string name="lifeEventsTitle">Life Events</string>
     <string name="familyTitle">Family</string>
     <string name="eventMarkerDefault">Click on a marker to see event details</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+    
+    <!-- Setting Titles -->
+    <string name="settings_header">Settings</string>
+    <string name="life_story_lines_header">Life Story Lines</string>
+    <string name="show_life_story_lines">Show Life Story Lines</string>
+    
+    <string name="family_tree_lines_header">Family Tree Lines</string>
+    <string name="show_family_tree_lines_header">Show Family Tree Lines</string>
+    
+    <string name="spouse_lines_header">Spouse Lines</string>
+    <string name="show_spouse_lines_header">Show Spouse Lines</string>
+    
+    <string name="father_side_header">Father\'s Side</string>
+    <string name="filter_father_side_header">Filter By Father\'s Side Of Family</string>
+    
+    <string name="mother_side_header">Mother\'s Side</string>
+    <string name="filter_mother_side_header">Filter By Mother\'s Side Of Family</string>
+    
+    <string name="male_events_header">Male Events</string>
+    <string name="female_events_header">Female Events</string>
+
+    <string name="filter_gender_events_header">Filter Events Based On Gender</string>
+
+    <string name="logout_header">Logout (Return to Login Screen)</string>
+
+    
+
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
 </resources>

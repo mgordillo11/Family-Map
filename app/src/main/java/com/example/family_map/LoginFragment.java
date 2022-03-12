@@ -131,7 +131,8 @@ public class LoginFragment extends Fragment {
                         Toast registerToast = Toast.makeText(view.getContext(), registerBundle.getString("message"), Toast.LENGTH_SHORT);
                         registerToast.show();
 
-                        if(registerBundle.getBoolean("status")) {
+                        if (registerBundle.getBoolean("status")) {
+                            DataCache.getInstance().userLoggedIn = true;
                             listener.notifyDone();
                         }
                     }
@@ -165,7 +166,8 @@ public class LoginFragment extends Fragment {
                         Toast registerToast = Toast.makeText(view.getContext(), loginBundle.getString("message"), Toast.LENGTH_SHORT);
                         registerToast.show();
 
-                        if(loginBundle.getBoolean("status")) {
+                        if (loginBundle.getBoolean("status")) {
+                            DataCache.getInstance().userLoggedIn = true;
                             listener.notifyDone();
                         }
                     }

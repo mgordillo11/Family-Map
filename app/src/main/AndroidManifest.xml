@@ -16,10 +16,15 @@
         android:theme="@style/Theme.FamilyMap"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".SettingsActivity"
+            android:parentActivityName=".MainActivity"
+            android:exported="false" />
+        <activity
             android:name=".EventActivity"
             android:exported="false" />
         <activity
             android:name=".PersonActivity"
+            android:parentActivityName=".MainActivity"
             android:exported="false" />
         <!--
              TODO: Before you run your application, you need a Google Maps API key.

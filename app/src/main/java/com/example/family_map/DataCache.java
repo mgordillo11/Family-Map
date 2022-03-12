@@ -13,10 +13,12 @@ import Models.Person;
 public class DataCache {
     //APPROACH #2 - Singleton Pattern
     private static DataCache instance = new DataCache();
+    private static Settings settingsInstance = new Settings();
 
     public static DataCache getInstance() {
         return instance;
     }
+    public static Settings getSettingsInstance() { return settingsInstance; }
 
     private DataCache() {
         familyPeople = new HashMap<>();
@@ -38,6 +40,8 @@ public class DataCache {
 
     private Authtoken currentAuthtoken;
     private Person currentPerson;
+
+    public boolean userLoggedIn = false;
 
     public Authtoken getCurrentAuthtoken() {
         return currentAuthtoken;
@@ -77,12 +81,22 @@ public class DataCache {
 
     public Person getChildFromParent(String parentID) {
         for (Map.Entry<String, Person> entry : getFamilyPeople().entrySet()) {
-            if(entry.getValue().getFatherID() != null && entry.getValue().getMotherID() != null)  {
-                if(entry.getValue().getFatherID().equals(parentID) || entry.getValue().getMotherID().equals(parentID)) {
+            if (entry.getValue().getFatherID() != null && entry.getValue().getMotherID() != null) {
+                if (entry.getValue().getFatherID().equals(parentID) || entry.getValue().getMotherID().equals(parentID)) {
                     return entry.getValue();
                 }
             }
         }
         return null;
+    }
+
+    public static class Settings {
+        public boolean lifeStoryLines = true;
+        public boolean familyTreeLines = true;
+        public boolean spouseLines = true;
+        public boolean fatherSide = true;
+        public boolean motherSide = true;
+        public boolean maleEvents = true;
+        public boolean femaleEvents = true;
     }
 }

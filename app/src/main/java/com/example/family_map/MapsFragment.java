@@ -3,6 +3,9 @@ package com.example.family_map;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -11,7 +14,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -36,12 +38,7 @@ public class MapsFragment extends Fragment {
     private String eventID;
     private String zoomedEvent;
 
-    public void setEventID(String eventID) {
-        this.eventID = eventID;
-    }
-
     private final OnMapReadyCallback callback = new OnMapReadyCallback() {
-
         /**
          * Manipulates the map once available.
          * This callback is triggered when the map is ready to be used.
@@ -112,11 +109,10 @@ public class MapsFragment extends Fragment {
                         }
 
                         if (currentSpouse != null) {
-                            //Event personEarliestEvent = DataCache.getInstance().getPersonEvents().get(currentPerson.getPersonID()).get(0);
                             Event spouseEarliestEvent = null;
                             List<Event> spouseEvents = DataCache.getInstance().getPersonEvents().get(currentSpouse.getPersonID());
-                            for(int i = 0; i < spouseEvents.size(); i++) {
-                                if(spouseEvents.get(i).getEventType().equals("Birth")) {
+                            for (int i = 0; i < spouseEvents.size(); i++) {
+                                if (spouseEvents.get(i).getEventType().equals("Birth")) {
                                     spouseEarliestEvent = spouseEvents.get(i);
                                     break;
                                 }
@@ -146,6 +142,35 @@ public class MapsFragment extends Fragment {
         }
     };
 
+
+    @Override
+    public void onCreate(Bundle savedInstance) {
+        super.onCreate(savedInstance);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_options, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.searchButton:
+                //Intent searchIntent = new Intent(getContext(), SettingsActivity.class);
+                //startActivity(searchIntent);
+                return true;
+            case R.id.settingsButton:
+                Intent searchIntent = new Intent(getContext(), SettingsActivity.class);
+                startActivity(searchIntent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -153,7 +178,6 @@ public class MapsFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
         detailedView = view.findViewById(R.id.markerInfo);
-
 
         if (getArguments() != null) {
             eventID = getArguments().getString("eventID");

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:title="searchBar"
+        app:showAsAction="ifRoom"
+        android:id="@+id/searchButton"
+        android:icon="@drawable/outline_search_24"/>
+
+    <item
+        android:title="settingBar"
+        app:showAsAction="ifRoom"
+        android:id="@+id/settingsButton"
+        android:icon="@drawable/outline_settings_24"/>
+
+</menu>

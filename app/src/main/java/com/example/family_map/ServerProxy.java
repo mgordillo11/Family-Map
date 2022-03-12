@@ -72,7 +72,9 @@ public class ServerProxy { //ServerFacade nickname
                 DataCache.getInstance().setCurrentAuthtoken(new Authtoken(registerResponse.getAuthtoken(), registerResponse.getUsername()));
 
                 currentStatus = getPeopleByUser(serverHost, serverPort, DataCache.getInstance().getCurrentAuthtoken());
-                if(!currentStatus) { return false; }
+                if (!currentStatus) {
+                    return false;
+                }
                 currentStatus = getEventsByUser(serverHost, serverPort, DataCache.getInstance().getCurrentAuthtoken());
 
                 //DataCache.getInstance().getCurrentPerson() = DataCache.getInstance().getFamilyPeople().get(registerResponse.getPersonID());
@@ -123,7 +125,9 @@ public class ServerProxy { //ServerFacade nickname
                 DataCache.getInstance().setCurrentAuthtoken(new Authtoken(loginResponse.getAuthtoken(), loginResponse.getUsername()));
 
                 currentStatus = getPeopleByUser(serverHost, serverPort, DataCache.getInstance().getCurrentAuthtoken());
-                if(!currentStatus) { return false; }
+                if (!currentStatus) {
+                    return false;
+                }
                 currentStatus = getEventsByUser(serverHost, serverPort, DataCache.getInstance().getCurrentAuthtoken());
 
                 DataCache.getInstance().setCurrentPerson(getPersonViaID(loginResponse.getPersonID()));
