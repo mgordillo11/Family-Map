@@ -82,7 +82,7 @@ public class MapsFragment extends Fragment {
                 googleMap.addMarker(new MarkerOptions().position(new LatLng(eventEntry.getValue().getLatitude(),
                         eventEntry.getValue().getLongitude())).icon(BitmapDescriptorFactory.defaultMarker(color)).title(markerTitle)).setTag(markerInfo);
 
-                /*googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(@NonNull Marker marker) {
                         Vector<String> markerData = (Vector<String>) marker.getTag();
@@ -96,7 +96,7 @@ public class MapsFragment extends Fragment {
                             detailedView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.baseline_woman_24, 0, 0);
                         }
 
-                        Event clickedMarkerEvent = DataCache.getInstance().getEvents().get(markerInfo.get(2));
+                        /*Event clickedMarkerEvent = DataCache.getInstance().getEvents().get(markerInfo.get(2));
 
                         Person currentPerson = DataCache.getInstance().getFamilyPeople().get(currentPersonID);
                         Person currentSpouse = null;
@@ -122,12 +122,12 @@ public class MapsFragment extends Fragment {
                             LatLng personLatLng = new LatLng(clickedMarkerEvent.getLatitude(), clickedMarkerEvent.getLongitude());
 
                             googleMap.addPolyline(new PolylineOptions().clickable(false).add(personLatLng, spouseLatLng));
-                        }
+                        }*/
 
                         detailedView.setText(marker.getTitle());
                         return true;
                     }
-                });*/
+                });
             }
 
             if (eventID != null) {
@@ -159,12 +159,12 @@ public class MapsFragment extends Fragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.searchButton:
-                //Intent searchIntent = new Intent(getContext(), SettingsActivity.class);
-                //startActivity(searchIntent);
+                Intent searchIntent = new Intent(getContext(), SearchActivity.class);
+                startActivity(searchIntent);
                 return true;
             case R.id.settingsButton:
-                Intent searchIntent = new Intent(getContext(), SettingsActivity.class);
-                startActivity(searchIntent);
+                Intent settingsIntent = new Intent(getContext(), SettingsActivity.class);
+                startActivity(settingsIntent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

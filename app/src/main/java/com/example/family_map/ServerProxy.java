@@ -11,6 +11,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import Models.Authtoken;
 import Models.Event;
@@ -77,7 +78,16 @@ public class ServerProxy { //ServerFacade nickname
                 }
                 currentStatus = getEventsByUser(serverHost, serverPort, DataCache.getInstance().getCurrentAuthtoken());
 
-                //DataCache.getInstance().getCurrentPerson() = DataCache.getInstance().getFamilyPeople().get(registerResponse.getPersonID());
+                for (Map.Entry<String, Event> recentLoadedEvent : DataCache.getInstance().getEvents().entrySet()) {
+                    Person checkGenderEvent = DataCache.getInstance().getFamilyPeople().get(recentLoadedEvent.getValue().getPersonID());
+
+                    if (checkGenderEvent.getGender().equals("m")) {
+                        DataCache.getInstance().getMaleEvents().add(recentLoadedEvent.getValue());
+                    } else {
+                        DataCache.getInstance().getFemaleEvents().add(recentLoadedEvent.getValue());
+                    }
+                }
+
                 DataCache.getInstance().setCurrentPerson(getPersonViaID(registerResponse.getPersonID()));
 
                 return currentStatus;
@@ -129,6 +139,16 @@ public class ServerProxy { //ServerFacade nickname
                     return false;
                 }
                 currentStatus = getEventsByUser(serverHost, serverPort, DataCache.getInstance().getCurrentAuthtoken());
+
+                for (Map.Entry<String, Event> recentLoadedEvent : DataCache.getInstance().getEvents().entrySet()) {
+                    Person checkGenderEvent = DataCache.getInstance().getFamilyPeople().get(recentLoadedEvent.getValue().getPersonID());
+
+                    if (checkGenderEvent.getGender().equals("m")) {
+                        DataCache.getInstance().getMaleEvents().add(recentLoadedEvent.getValue());
+                    } else {
+                        DataCache.getInstance().getFemaleEvents().add(recentLoadedEvent.getValue());
+                    }
+                }
 
                 DataCache.getInstance().setCurrentPerson(getPersonViaID(loginResponse.getPersonID()));
 

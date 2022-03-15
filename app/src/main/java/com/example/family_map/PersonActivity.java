@@ -210,7 +210,6 @@ public class PersonActivity extends AppCompatActivity {
             lifeEventItemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    //Toast.makeText(PersonActivity.this, "Event Item Click Working", Toast.LENGTH_SHORT).show();
                     Intent eventIntent = new Intent(PersonActivity.this, EventActivity.class);
                     eventIntent.putExtra("eventID", itemEvent.getEventID());
                     eventIntent.putExtra("eventInfo", newEventActivityInfo);
