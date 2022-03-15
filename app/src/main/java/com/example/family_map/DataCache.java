@@ -1,5 +1,8 @@
 package com.example.family_map;
 
+import android.util.Pair;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -18,7 +21,10 @@ public class DataCache {
     public static DataCache getInstance() {
         return instance;
     }
-    public static Settings getSettingsInstance() { return settingsInstance; }
+
+    public static Settings getSettingsInstance() {
+        return settingsInstance;
+    }
 
     private DataCache() {
         familyPeople = new HashMap<>();
@@ -88,6 +94,57 @@ public class DataCache {
             }
         }
         return null;
+    }
+
+    public Pair<List<Event>, List<Person>> searchFilter(String searchString) {
+        List<Event> dataEvents = new ArrayList<>();
+        List<Person> dataPeople = new ArrayList<>();
+
+        for (Map.Entry<String, Event> currentEvent : DataCache.getInstance().getEvents().entrySet()) {
+            dataEvents.add(currentEvent.getValue());
+        }
+
+        for (Map.Entry<String, Person> currentPerson : DataCache.getInstance().getFamilyPeople().entrySet()) {
+            dataPeople.add(currentPerson.getValue());
+        }
+
+        List<Event> filteredEvents = new ArrayList<>();
+        List<Person> filteredPeople = new ArrayList<>();
+
+        if (searchString.isEmpty()) {
+            filteredEvents.addAll(dataEvents);
+            filteredPeople.addAll(dataPeople);
+        } else {
+            String filteredString = searchString.toUpperCase().trim();
+
+            for (Event currentEvent : dataEvents) {
+                String currentYear = Integer.toString(currentEvent.getYear()).toLowerCase();
+                String currentLongitude = Double.toString(currentEvent.getLongitude()).toLowerCase();
+                String currentLatitude = Double.toString(currentEvent.getLatitude()).toLowerCase();
+
+                if (currentEvent.getEventType().toLowerCase().contains(searchString) ||
+                        currentYear.contains(filteredString) || currentEvent.getCountry().toLowerCase().contains(filteredString) ||
+                        currentEvent.getCity().toLowerCase().contains(filteredString) ||
+                        currentEvent.getAssociatedUsername().toLowerCase().contains(filteredString) ||
+                        currentEvent.getEventID().toLowerCase().contains(filteredString)
+                        || currentEvent.getPersonID().toLowerCase().contains(filteredString) ||
+                        currentLongitude.contains(filteredString) || currentLatitude.contains(filteredString)) {
+
+                    filteredEvents.add(currentEvent);
+
+                }
+            }
+
+            for (Person currentPerson : dataPeople) {
+                if (currentPerson.getFirstName().toLowerCase().contains(filteredString) ||
+                        currentPerson.getLastName().toLowerCase().contains(filteredString) ||
+                        currentPerson.getPersonID().toLowerCase().contains(filteredString)) {
+                    filteredPeople.add(currentPerson);
+                }
+            }
+        }
+
+        return new Pair<List<Event>, List<Person>>(filteredEvents, filteredPeople);
     }
 
     public static class Settings {

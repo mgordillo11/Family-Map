@@ -82,7 +82,7 @@ public class MapsFragment extends Fragment {
                 googleMap.addMarker(new MarkerOptions().position(new LatLng(eventEntry.getValue().getLatitude(),
                         eventEntry.getValue().getLongitude())).icon(BitmapDescriptorFactory.defaultMarker(color)).title(markerTitle)).setTag(markerInfo);
 
-                googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                /*googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(@NonNull Marker marker) {
                         Vector<String> markerData = (Vector<String>) marker.getTag();
@@ -127,7 +127,7 @@ public class MapsFragment extends Fragment {
                         detailedView.setText(marker.getTitle());
                         return true;
                     }
-                });
+                });*/
             }
 
             if (eventID != null) {
