@@ -1,6 +1,7 @@
 package com.example.family_map;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.view.View;
@@ -38,7 +39,6 @@ public class SettingsActivity extends AppCompatActivity {
         logoutView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //FragmentManager fragmentManager = getSupportFragmentManager();
                 DataCache.getInstance().userLoggedIn = false;
                 Intent logoutIntent = new Intent(SettingsActivity.this, MainActivity.class);
                 startActivity(logoutIntent);
@@ -51,21 +51,52 @@ public class SettingsActivity extends AppCompatActivity {
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
 
-            SwitchPreferenceCompat  lifeStoryLines = findPreference("life_story_lines");
-            SwitchPreferenceCompat familyTreeLine = findPreference("family_tree_lines");
+            SwitchPreferenceCompat lifeStoryLines = findPreference("life_story_lines");
+            SwitchPreferenceCompat familyTreeLines = findPreference("family_tree_lines");
             SwitchPreferenceCompat spouseLines = findPreference("spouse_lines");
             SwitchPreferenceCompat fatherSide = findPreference("father_side");
             SwitchPreferenceCompat motherSide = findPreference("mother_side");
             SwitchPreferenceCompat maleEvents = findPreference("male_events");
             SwitchPreferenceCompat femaleEvents = findPreference("female_events");
 
-            lifeStoryLines.setChecked(true);
-            familyTreeLine.setChecked(true);
-            spouseLines.setChecked(true);
-            fatherSide.setChecked(true);
-            motherSide.setChecked(true);
-            maleEvents.setChecked(true);
-            femaleEvents.setChecked(true);
+            lifeStoryLines.setChecked(DataCache.getSettings().lifeStoryLines);
+            familyTreeLines.setChecked(DataCache.getSettings().familyTreeLines);
+            spouseLines.setChecked(DataCache.getSettings().spouseLines);
+            fatherSide.setChecked(DataCache.getSettings().fatherSide);
+            motherSide.setChecked(DataCache.getSettings().motherSide);
+            maleEvents.setChecked(DataCache.getSettings().maleEvents);
+            femaleEvents.setChecked(DataCache.getSettings().femaleEvents);
+
+            getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
+                @Override
+                public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+                    switch (s) {
+                        case "life_story_lines":
+                            DataCache.getSettings().lifeStoryLines = lifeStoryLines.isChecked();
+                            break;
+                        case "family_tree_lines":
+                            DataCache.getSettings().familyTreeLines = familyTreeLines.isChecked();
+                            break;
+                        case "spouse_lines":
+                            DataCache.getSettings().spouseLines = spouseLines.isChecked();
+                            break;
+                        case "father_side":
+                            DataCache.getSettings().fatherSide = fatherSide.isChecked();
+                            break;
+                        case "mother_side":
+                            DataCache.getSettings().motherSide = motherSide.isChecked();
+                            break;
+                        case "male_events":
+                            DataCache.getSettings().maleEvents = maleEvents.isChecked();
+                            break;
+                        case "female_events":
+                            DataCache.getSettings().femaleEvents = femaleEvents.isChecked();
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            });
         }
     }
 }

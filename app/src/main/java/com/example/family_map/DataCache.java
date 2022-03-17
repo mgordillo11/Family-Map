@@ -1,14 +1,11 @@
 package com.example.family_map;
 
-import android.provider.ContactsContract;
 import android.util.Pair;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import Models.Authtoken;
 import Models.Event;
@@ -23,17 +20,17 @@ public class DataCache {
         return instance;
     }
 
-    /*public static Settings getSettingsInstance() {
-        return settingsInstance;
-    }*/
+    public static Settings getSettings() {
+        return settings;
+    }
 
     private DataCache() {
         familyPeople = new HashMap<>();
         familyEvents = new HashMap<>();
         personEvents = new HashMap<>();
         userFamily = new HashMap<>();
-        paternalAncestors = new HashSet<>();
-        maternalAncestors = new HashSet<>();
+        paternalAncestors = new ArrayList<>();
+        maternalAncestors = new ArrayList<>();
         maleEvents = new ArrayList<>();
         femaleEvents = new ArrayList<>();
     }
@@ -44,8 +41,8 @@ public class DataCache {
     private Map<String, List<Event>> personEvents; //Get a list of events chronologically based on a person's ID
     private Map<String, List<Person>> userFamily; //Get a list of family based on a person's ID
 
-    private Set<String> paternalAncestors; //Get ancestors on dad's side
-    private Set<String> maternalAncestors; //Get ancestor's on mom's side
+    private List<Person> paternalAncestors; //Get ancestors on dad's side
+    private List<Person> maternalAncestors; //Get ancestor's on mom's side
 
     private List<Event> maleEvents;
     private List<Event> femaleEvents;
@@ -55,47 +52,102 @@ public class DataCache {
 
     public boolean userLoggedIn = false;
 
-    public Authtoken getCurrentAuthtoken() {
-        return currentAuthtoken;
+    public List<Event> settingsUpdate() {
+        if (settings.femaleEvents && settings.maleEvents && settings.motherSide && settings.fatherSide) {
+            List<Event> updatedEvents = new ArrayList<>();
+            updatedEvents.addAll(getInstance().femaleEvents);
+            updatedEvents.addAll(getInstance().maleEvents);
+            return updatedEvents;
+        }
+
+        if (settings.maleEvents && settings.motherSide && settings.fatherSide) {
+            return getInstance().getMaleEvents();
+        }
+
+        if (settings.femaleEvents && settings.motherSide && settings.fatherSide) {
+            return getInstance().getFemaleEvents();
+        }
+
+        if (settings.femaleEvents && settings.fatherSide) {
+            return getEventOfParentSideByGender("f", "Dad");
+        }
+
+        if (settings.maleEvents && settings.fatherSide) {
+            return getEventOfParentSideByGender("m", "Dad");
+        }
+
+        if (settings.maleEvents && settings.motherSide) {
+            return getEventOfParentSideByGender("m", "Mom");
+        }
+
+        if (settings.femaleEvents && settings.motherSide) {
+            return getEventOfParentSideByGender("f", "Mom");
+        }
+
+        /*
+        if (settings.femaleEvents && settings.motherSide && settings.maleEvents) {
+            ArrayList<Event> tempArrayList = new ArrayList<>();
+            tempArrayList.addAll(getEventOfParentSideByGender("f", "Mom"));
+            tempArrayList.addAll(getEventOfParentSideByGender("m", "Mom"));
+            return tempArrayList;
+        }
+
+        if (settings.femaleEvents && settings.fatherSide && settings.maleEvents) {
+            ArrayList<Event> tempArrayList = new ArrayList<>();
+            tempArrayList.addAll(getEventOfParentSideByGender("f", "Dad"));
+            tempArrayList.addAll(getEventOfParentSideByGender("m", "Dad"));
+            return tempArrayList;
+        }*/
+
+        if (!settings.maleEvents && !settings.femaleEvents) {
+            return null;
+        }
+        if (!settings.motherSide && !settings.fatherSide) {
+            return null;
+        }
+
+        return null;
+
     }
 
-    public void setCurrentAuthtoken(Authtoken currentAuthtoken) {
-        this.currentAuthtoken = currentAuthtoken;
+    public List<Event> getEventOfParentSideByGender(String gender, String parentSide) {
+        List<Event> genderArray = new ArrayList<>();
+
+        genderArray.addAll(getInstance().getParentEventSide(gender, parentSide));
+
+        return genderArray;
     }
 
-    public Map<String, List<Event>> getPersonEvents() {
-        return personEvents;
-    }
+    public List<Event> getParentEventSide(String gender, String parentSide) {
+        List<Event> genderArray = new ArrayList<>();
 
-    public Map<String, List<Person>> getUserFamily() {
-        return userFamily;
-    }
-
-    public Map<String, Event> getEvents() {
-        return familyEvents;
-    }
-
-    public Person getCurrentPerson() {
-        return currentPerson;
-    }
-
-    public void setCurrentPerson(Person currentPerson) {
-        this.currentPerson = currentPerson;
-    }
-
-    public Map<String, Person> getFamilyPeople() {
-        return familyPeople;
-    }
-
-    public Person getChildFromParent(String parentID) {
-        for (Map.Entry<String, Person> entry : getFamilyPeople().entrySet()) {
-            if (entry.getValue().getFatherID() != null && entry.getValue().getMotherID() != null) {
-                if (entry.getValue().getFatherID().equals(parentID) || entry.getValue().getMotherID().equals(parentID)) {
-                    return entry.getValue();
+        if (parentSide.equals("Dad")) {
+            for (Person currentPerson : getInstance().getPaternalAncestors()) {
+                if (currentPerson.getGender().equals(gender)) {
+                    List<Event> currentPersonEvents = getInstance().personEvents.get(currentPerson.getPersonID());
+                    genderArray.addAll(currentPersonEvents);
+                }
+            }
+        } else {
+            for (Person currentPerson : getInstance().getMaternalAncestors()) {
+                if (currentPerson.getGender().equals(gender)) {
+                    List<Event> currentPersonEvents = getInstance().personEvents.get(currentPerson.getPersonID());
+                    genderArray.addAll(currentPersonEvents);
                 }
             }
         }
-        return null;
+
+        return genderArray;
+    }
+
+    public static class Settings {
+        public boolean lifeStoryLines = true;
+        public boolean familyTreeLines = true;
+        public boolean spouseLines = true;
+        public boolean fatherSide = true;
+        public boolean motherSide = true;
+        public boolean maleEvents = true;
+        public boolean femaleEvents = true;
     }
 
     public Pair<List<Event>, List<Person>> searchFilter(String searchString) {
@@ -149,7 +201,20 @@ public class DataCache {
             }
         }
 
-        return new Pair<List<Event>, List<Person>>(filteredEvents, filteredPeople);
+        return new Pair<>(filteredEvents, filteredPeople);
+    }
+
+    public void getFamilySide(Person currentPerson, String familySide) {
+        if (currentPerson.getMotherID() != null & currentPerson.getFatherID() != null) {
+            getFamilySide(DataCache.getInstance().familyPeople.get(currentPerson.getMotherID()), familySide);
+            getFamilySide(DataCache.getInstance().familyPeople.get(currentPerson.getFatherID()), familySide);
+        }
+
+        if (familySide.equals("Mom")) {
+            getInstance().getMaternalAncestors().add(currentPerson);
+        } else {
+            getInstance().getPaternalAncestors().add(currentPerson);
+        }
     }
 
     public List<Event> getMaleEvents() {
@@ -160,27 +225,54 @@ public class DataCache {
         return femaleEvents;
     }
 
-    public List<Event> settingsUpdate() {
-        if(settings.femaleEvents && settings.maleEvents && settings.motherSide && settings.fatherSide) {
-            List<Event> updatedEvents = new ArrayList<>();
-            updatedEvents.addAll(getInstance().femaleEvents);
-            updatedEvents.addAll(getInstance().maleEvents);
-            return updatedEvents;
-        }
+    public List<Person> getPaternalAncestors() {
+        return paternalAncestors;
+    }
 
-        if(settings.maleEvents) {
-            return getInstance().getMaleEvents();
+    public List<Person> getMaternalAncestors() {
+        return maternalAncestors;
+    }
+
+    public Map<String, Person> getFamilyPeople() {
+        return familyPeople;
+    }
+
+    public Person getChildFromParent(String parentID) {
+        for (Map.Entry<String, Person> entry : getFamilyPeople().entrySet()) {
+            if (entry.getValue().getFatherID() != null && entry.getValue().getMotherID() != null) {
+                if (entry.getValue().getFatherID().equals(parentID) || entry.getValue().getMotherID().equals(parentID)) {
+                    return entry.getValue();
+                }
+            }
         }
         return null;
     }
 
-    public static class Settings {
-        public boolean lifeStoryLines = true;
-        public boolean familyTreeLines = true;
-        public boolean spouseLines = true;
-        public boolean fatherSide = true;
-        public boolean motherSide = true;
-        public boolean maleEvents = true;
-        public boolean femaleEvents = true;
+    public Map<String, List<Event>> getPersonEvents() {
+        return personEvents;
+    }
+
+    public Map<String, List<Person>> getUserFamily() {
+        return userFamily;
+    }
+
+    public Map<String, Event> getEvents() {
+        return familyEvents;
+    }
+
+    public Person getCurrentPerson() {
+        return currentPerson;
+    }
+
+    public Authtoken getCurrentAuthtoken() {
+        return currentAuthtoken;
+    }
+
+    public void setCurrentAuthtoken(Authtoken currentAuthtoken) {
+        this.currentAuthtoken = currentAuthtoken;
+    }
+
+    public void setCurrentPerson(Person currentPerson) {
+        this.currentPerson = currentPerson;
     }
 }

@@ -50,52 +50,52 @@ public class MapsFragment extends Fragment {
          */
         @Override
         public void onMapReady(GoogleMap googleMap) {
-            for (Map.Entry<String, Event> eventEntry : DataCache.getInstance().getEvents().entrySet()) {
-                float color;
-                switch (eventEntry.getValue().getEventType()) {
-                    case "Birth":
-                        color = BitmapDescriptorFactory.HUE_MAGENTA;
-                        break;
-                    case "Marriage":
-                        color = BitmapDescriptorFactory.HUE_BLUE;
-                        break;
-                    case "Death":
-                        color = BitmapDescriptorFactory.HUE_GREEN;
-                        break;
-                    default:
-                        color = BitmapDescriptorFactory.HUE_CYAN;
-                        break;
-                }
 
-                Event currentEvent = eventEntry.getValue();
-                Person currentPerson = DataCache.getInstance().getFamilyPeople().get(currentEvent.getPersonID());
+            if(DataCache.getInstance().settingsUpdate() != null) {
+                for (Event eventEntry : DataCache.getInstance().settingsUpdate()) {
+                    float color;
+                    switch (eventEntry.getEventType()) {
+                        case "Birth":
+                            color = BitmapDescriptorFactory.HUE_MAGENTA;
+                            break;
+                        case "Marriage":
+                            color = BitmapDescriptorFactory.HUE_BLUE;
+                            break;
+                        case "Death":
+                            color = BitmapDescriptorFactory.HUE_GREEN;
+                            break;
+                        default:
+                            color = BitmapDescriptorFactory.HUE_CYAN;
+                            break;
+                    }
 
-                Vector<String> markerInfo = new Vector<>();
-                markerInfo.add(0, currentEvent.getPersonID());
-                markerInfo.add(1, currentPerson.getGender());
-                markerInfo.add(2, currentEvent.getEventID());
+                    Person currentPerson = DataCache.getInstance().getFamilyPeople().get(eventEntry.getPersonID());
 
-                String markerTitle = currentPerson.getFirstName() + " " + currentPerson.getLastName() + "\n"
-                        + currentEvent.getEventType().toUpperCase() + ": " + currentEvent.getCity() + ", " +
-                        currentEvent.getCountry() + " (" + currentEvent.getYear() + ")";
+                    Vector<String> markerInfo = new Vector<>();
+                    markerInfo.add(0, eventEntry.getPersonID());
+                    markerInfo.add(1, currentPerson.getGender());
+                    markerInfo.add(2, eventEntry.getEventID());
 
-                googleMap.addMarker(new MarkerOptions().position(new LatLng(eventEntry.getValue().getLatitude(),
-                        eventEntry.getValue().getLongitude())).icon(BitmapDescriptorFactory.defaultMarker(color)).title(markerTitle)).setTag(markerInfo);
+                    String markerTitle = currentPerson.getFirstName() + " " + currentPerson.getLastName() + "\n"
+                            + eventEntry.getEventType().toUpperCase() + ": " + eventEntry.getCity() + ", " +
+                            eventEntry.getCountry() + " (" + eventEntry.getYear() + ")";
 
-                googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                    @Override
-                    public boolean onMarkerClick(@NonNull Marker marker) {
-                        Vector<String> markerData = (Vector<String>) marker.getTag();
+                    googleMap.addMarker(new MarkerOptions().position(new LatLng(eventEntry.getLatitude(),
+                            eventEntry.getLongitude())).icon(BitmapDescriptorFactory.defaultMarker(color)).title(markerTitle)).setTag(markerInfo);
 
-                        currentPersonID = markerData.get(0);
-                        currentGender = markerData.get(1);
+                    googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                        @Override
+                        public boolean onMarkerClick(@NonNull Marker marker) {
+                            Vector<String> markerData = (Vector<String>) marker.getTag();
 
-                        if (currentGender.equals("m")) {
-                            detailedView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.baseline_man_24, 0, 0);
-                        } else {
-                            detailedView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.baseline_woman_24, 0, 0);
-                        }
+                            currentPersonID = markerData.get(0);
+                            currentGender = markerData.get(1);
 
+                            if (currentGender.equals("m")) {
+                                detailedView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.baseline_man_24, 0, 0);
+                            } else {
+                                detailedView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.baseline_woman_24, 0, 0);
+                            }
                         /*Event clickedMarkerEvent = DataCache.getInstance().getEvents().get(markerInfo.get(2));
 
                         Person currentPerson = DataCache.getInstance().getFamilyPeople().get(currentPersonID);
@@ -123,25 +123,26 @@ public class MapsFragment extends Fragment {
 
                             googleMap.addPolyline(new PolylineOptions().clickable(false).add(personLatLng, spouseLatLng));
                         }*/
+                            detailedView.setText(marker.getTitle());
+                            return true;
+                        }
+                    });
+                }
 
-                        detailedView.setText(marker.getTitle());
-                        return true;
-                    }
-                });
+                if (eventID != null) {
+                    Event markerPressedEvent = DataCache.getInstance().getEvents().get(eventID);
+
+                    assert markerPressedEvent != null;
+                    LatLng markerLocation = new LatLng(markerPressedEvent.getLatitude(), markerPressedEvent.getLongitude());
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(markerLocation, 10));
+
+                    detailedView.setText(zoomedEvent);
+                }
             }
 
-            if (eventID != null) {
-                Event markerPressedEvent = DataCache.getInstance().getEvents().get(eventID);
-
-                assert markerPressedEvent != null;
-                LatLng markerLocation = new LatLng(markerPressedEvent.getLatitude(), markerPressedEvent.getLongitude());
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(markerLocation, 10));
-
-                detailedView.setText(zoomedEvent);
-            }
+            System.out.println("Test");
         }
     };
-
 
     @Override
     public void onCreate(Bundle savedInstance) {

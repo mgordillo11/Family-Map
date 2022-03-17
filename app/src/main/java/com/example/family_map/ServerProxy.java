@@ -78,6 +78,7 @@ public class ServerProxy { //ServerFacade nickname
                 }
                 currentStatus = getEventsByUser(serverHost, serverPort, DataCache.getInstance().getCurrentAuthtoken());
 
+                //Populates both lists based on if the event was associated with a male or female
                 for (Map.Entry<String, Event> recentLoadedEvent : DataCache.getInstance().getEvents().entrySet()) {
                     Person checkGenderEvent = DataCache.getInstance().getFamilyPeople().get(recentLoadedEvent.getValue().getPersonID());
 
@@ -89,6 +90,11 @@ public class ServerProxy { //ServerFacade nickname
                 }
 
                 DataCache.getInstance().setCurrentPerson(getPersonViaID(registerResponse.getPersonID()));
+
+                //Populates the mother side of the current user
+                DataCache.getInstance().getFamilySide(DataCache.getInstance().getCurrentPerson(), "Mom");
+                //Populates the father side of the current user
+                DataCache.getInstance().getFamilySide(DataCache.getInstance().getCurrentPerson(), "Dad");
 
                 return currentStatus;
             } else {
@@ -151,6 +157,11 @@ public class ServerProxy { //ServerFacade nickname
                 }
 
                 DataCache.getInstance().setCurrentPerson(getPersonViaID(loginResponse.getPersonID()));
+
+                //Populates the mother side of the current user
+                DataCache.getInstance().getFamilySide(DataCache.getInstance().getCurrentPerson(), "Mom");
+                //Populates the father side of the current user
+                DataCache.getInstance().getFamilySide(DataCache.getInstance().getCurrentPerson(), "Dad");
 
                 return currentStatus;
             } else {
