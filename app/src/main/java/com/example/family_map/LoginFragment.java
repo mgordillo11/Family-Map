@@ -138,7 +138,7 @@ public class LoginFragment extends Fragment {
                     }
                 };
 
-                String genderChoice = "";
+                String genderChoice;
 
                 if (genderButtons.findViewById(genderButtons.getCheckedRadioButtonId()) == maleButton) {
                     genderChoice = "m";
@@ -172,6 +172,7 @@ public class LoginFragment extends Fragment {
                         }
                     }
                 };
+
                 LoginRequest loginRequest = new LoginRequest(editTextUsername.getText().toString(), editTextPassword.getText().toString());
 
                 LoginTask loginTask = new LoginTask(loginRequest, editTextServerHost.getText().toString(), editTextServerPort.getText().toString(), UIThreadHandler);

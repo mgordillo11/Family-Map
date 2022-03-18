@@ -24,26 +24,9 @@ import RequestResponse.RegisterRequest;
 import RequestResponse.RegisterResponse;
 
 public class ServerProxy { //ServerFacade nickname
-    //THESE 4 API'S WILL BE USED IN THE CLIENT
-    //LoginResult login(LoginRequest request)
-    //RegisterResult register(RegisterRequest request)
-    //GetPeopleResult getPeople(GetPeopleRequest request)
-    //GetEventsResult getEvents(GetEventsResult request)
-
-    //THESE BOTTOM API'S ARE FOR TESTING PURPOSE ONLY, THE CLIENT WILL NEVER CALL THESE API'S
-    //clear
-    //fill
-    //getPersonByID or Username
-    //getEvents
-    //load
-
     public static void main(String[] args) {
-
         String serverHost = args[0];
         String serverPort = args[1];
-
-        //getGameList(serverHost, serverPort);
-        //claimRoute(serverHost, serverPort);
     }
 
     public static boolean postRegisterUser(String serverHost, String serverPort, RegisterRequest registerRequest) {

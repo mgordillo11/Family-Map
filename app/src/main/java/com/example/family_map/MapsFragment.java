@@ -1,7 +1,9 @@
 package com.example.family_map;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,10 +24,13 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import Models.Event;
@@ -37,6 +42,7 @@ public class MapsFragment extends Fragment {
     private String currentGender;
     private String eventID;
     private String zoomedEvent;
+    private Set<Polyline> currentMapLines;
 
     private final OnMapReadyCallback callback = new OnMapReadyCallback() {
         /**
@@ -51,7 +57,7 @@ public class MapsFragment extends Fragment {
         @Override
         public void onMapReady(GoogleMap googleMap) {
 
-            if(DataCache.getInstance().settingsUpdate() != null) {
+            if (DataCache.getInstance().settingsUpdate() != null) {
                 for (Event eventEntry : DataCache.getInstance().settingsUpdate()) {
                     float color;
                     switch (eventEntry.getEventType()) {
@@ -75,6 +81,7 @@ public class MapsFragment extends Fragment {
                     markerInfo.add(0, eventEntry.getPersonID());
                     markerInfo.add(1, currentPerson.getGender());
                     markerInfo.add(2, eventEntry.getEventID());
+                    //markerInfo.add(3, new LatLng(eventEntry.getLatitude(), eventEntry.getLongitude()));
 
                     String markerTitle = currentPerson.getFirstName() + " " + currentPerson.getLastName() + "\n"
                             + eventEntry.getEventType().toUpperCase() + ": " + eventEntry.getCity() + ", " +
@@ -96,33 +103,54 @@ public class MapsFragment extends Fragment {
                             } else {
                                 detailedView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.baseline_woman_24, 0, 0);
                             }
-                        /*Event clickedMarkerEvent = DataCache.getInstance().getEvents().get(markerInfo.get(2));
 
-                        Person currentPerson = DataCache.getInstance().getFamilyPeople().get(currentPersonID);
-                        Person currentSpouse = null;
+                            Event clickedMarkerEvent = DataCache.getInstance().getEvents().get(markerData.get(2));
+                            Person currentPerson = DataCache.getInstance().getFamilyPeople().get(currentPersonID);
 
-                        for (Map.Entry<String, Person> spouseSearch : DataCache.getInstance().getFamilyPeople().entrySet()) {
-                            assert currentPerson != null;
-                            if (spouseSearch.getValue().getPersonID().equals(currentPerson.getSpouseID())) {
-                                currentSpouse = spouseSearch.getValue();
-                            }
-                        }
+                            if (currentPerson.getSpouseID() != null && DataCache.getSettings().spouseLines) {
+                                Person currentSpouse = DataCache.getInstance().getFamilyPeople().get(currentPerson.getSpouseID());
+                                List<Event> spouseEvents = DataCache.getInstance().getPersonEvents().get(currentSpouse.getPersonID());
 
-                        if (currentSpouse != null) {
-                            Event spouseEarliestEvent = null;
-                            List<Event> spouseEvents = DataCache.getInstance().getPersonEvents().get(currentSpouse.getPersonID());
-                            for (int i = 0; i < spouseEvents.size(); i++) {
-                                if (spouseEvents.get(i).getEventType().equals("Birth")) {
-                                    spouseEarliestEvent = spouseEvents.get(i);
-                                    break;
+                                int earliestEvent = spouseEvents.get(0).getYear();
+                                Event spouseEarliestEvent = spouseEvents.get(0);
+
+                                for (int i = 0; i < spouseEvents.size(); i++) {
+                                    if (earliestEvent > spouseEvents.get(i).getYear()) {
+                                        earliestEvent = spouseEvents.get(i).getYear();
+                                        spouseEarliestEvent = spouseEvents.get(i);
+                                    }
                                 }
+
+                                LatLng spouseLatLng = new LatLng(spouseEarliestEvent.getLatitude(), spouseEarliestEvent.getLongitude());
+                                LatLng personLatLng = new LatLng(clickedMarkerEvent.getLatitude(), clickedMarkerEvent.getLongitude());
+
+                                googleMap.addPolyline(new PolylineOptions().clickable(false).add(spouseLatLng, personLatLng).color(Color.RED));
                             }
 
-                            LatLng spouseLatLng = new LatLng(spouseEarliestEvent.getLatitude(), spouseEarliestEvent.getLongitude());
-                            LatLng personLatLng = new LatLng(clickedMarkerEvent.getLatitude(), clickedMarkerEvent.getLongitude());
+                            if (DataCache.getSettings().lifeStoryLines) {
+                                List<Event> currentPersonEvents = DataCache.getInstance().getPersonEvents().get(currentPerson.getPersonID());
+                                List<LatLng> eventLocations = new ArrayList<>();
 
-                            googleMap.addPolyline(new PolylineOptions().clickable(false).add(personLatLng, spouseLatLng));
-                        }*/
+                                int earliestEvent = currentPersonEvents.get(0).getYear();
+
+                                for (int i = 0; i < currentPersonEvents.size(); i++) {
+                                    LatLng currentLatLng = new LatLng(currentPersonEvents.get(i).getLatitude(),
+                                            currentPersonEvents.get(i).getLongitude());
+
+                                    if (earliestEvent > currentPersonEvents.get(i).getYear()) {
+                                        eventLocations.add(currentLatLng);
+                                    } else {
+                                        eventLocations.add(currentLatLng);
+                                    }
+                                }
+
+                                googleMap.addPolyline(new PolylineOptions().clickable(false).addAll(eventLocations).color(Color.BLUE));
+                            }
+
+                            if (DataCache.getSettings().familyTreeLines) {
+                                addFamilyTreeLines(googleMap, clickedMarkerEvent.getEventID(), 20);
+                            }
+
                             detailedView.setText(marker.getTitle());
                             return true;
                         }
@@ -139,10 +167,42 @@ public class MapsFragment extends Fragment {
                     detailedView.setText(zoomedEvent);
                 }
             }
-
             System.out.println("Test");
         }
     };
+
+    public void addFamilyTreeLines(GoogleMap googleMap, String currentEventID, int currentPolylineWidth) {
+        Event currentEvent = DataCache.getInstance().getEvents().get(currentEventID);
+        Person currentPerson = DataCache.getInstance().getFamilyPeople().get(currentEvent.getPersonID());
+
+        Event earliestMotherEvent = null;
+        Event earliestFatherEvent = null;
+
+        if(currentPerson.getMotherID() != null && currentPerson.getFatherID() != null) {
+            earliestMotherEvent = DataCache.getInstance().getEarliestEvent(currentPerson.getMotherID());
+            earliestFatherEvent = DataCache.getInstance().getEarliestEvent(currentPerson.getFatherID());
+
+            List<LatLng> currentMotherSide = new ArrayList<>();
+            currentMotherSide.add(new LatLng(currentEvent.getLatitude(), currentEvent.getLongitude()));
+            currentMotherSide.add(new LatLng(earliestMotherEvent.getLatitude(), earliestMotherEvent.getLongitude()));
+
+            List<LatLng> currentFatherSide = new ArrayList<>();
+            currentFatherSide.add(new LatLng(currentEvent.getLatitude(), currentEvent.getLongitude()));
+            currentFatherSide.add(new LatLng(earliestFatherEvent.getLatitude(), earliestFatherEvent.getLongitude()));
+
+            googleMap.addPolyline(new PolylineOptions().clickable(false).addAll(currentMotherSide).color(Color.CYAN).width(currentPolylineWidth));
+            googleMap.addPolyline(new PolylineOptions().clickable(false).addAll(currentFatherSide).color(Color.CYAN).width(currentPolylineWidth));
+        }
+
+        if(currentPerson.getMotherID() != null) {
+            addFamilyTreeLines(googleMap, earliestMotherEvent.getEventID(), currentPolylineWidth - 5);
+        }
+
+        if(currentPerson.getFatherID() != null) {
+            addFamilyTreeLines(googleMap, earliestFatherEvent.getEventID(),currentPolylineWidth - 5);
+        }
+
+    }
 
     @Override
     public void onCreate(Bundle savedInstance) {

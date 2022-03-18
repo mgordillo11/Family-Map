@@ -140,6 +140,22 @@ public class DataCache {
         return genderArray;
     }
 
+    public Event getEarliestEvent(String personID) {
+        List<Event> currentEarliestEvents = getInstance().getPersonEvents().get(personID);
+
+        int earliestYear = currentEarliestEvents.get(0).getYear();
+        Event earliestEvent = currentEarliestEvents.get(0);
+
+        for(int i = 0; i < currentEarliestEvents.size(); i++) {
+            if(earliestYear > currentEarliestEvents.get(i).getYear()) {
+                earliestYear = currentEarliestEvents.get(i).getYear();
+                earliestEvent = currentEarliestEvents.get(i);
+            }
+        }
+
+        return earliestEvent;
+    }
+
     public static class Settings {
         public boolean lifeStoryLines = true;
         public boolean familyTreeLines = true;
