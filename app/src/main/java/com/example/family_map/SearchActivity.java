@@ -1,11 +1,5 @@
 package com.example.family_map;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Pair;
@@ -14,11 +8,14 @@ import android.view.ViewGroup;
 import android.widget.SearchView;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListResourceBundle;
 
 import Models.Event;
 import Models.Person;
@@ -33,56 +30,57 @@ public class SearchActivity extends AppCompatActivity {
         setContentView(R.layout.activity_search);
 
         ActionBar actionBar = getSupportActionBar();
-
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        RecyclerView searchRecycler = findViewById(R.id.RecyclerView);
-        searchRecycler.setLayoutManager(new LinearLayoutManager(SearchActivity.this));
+        if(DataCache.getSettings().maleEvents || DataCache.getSettings().femaleEvents) {
+            RecyclerView searchRecycler = findViewById(R.id.RecyclerView);
+            searchRecycler.setLayoutManager(new LinearLayoutManager(SearchActivity.this));
 
-        SearchView searchView = findViewById(R.id.searchViewActivity);
+            SearchView searchView = findViewById(R.id.searchViewActivity);
 
-        List<Event> filterEventResults = new ArrayList<>();
-        List<Person> filterPeopleResults = new ArrayList<>();
+            List<Event> filterEventResults = new ArrayList<>();
+            List<Person> filterPeopleResults = new ArrayList<>();
 
-        if (searchView.getQuery().toString().equals("")) {
-            Pair<List<Event>, List<Person>> filterResults = DataCache.getInstance().searchFilter("");
-            filterEventResults.addAll(filterResults.first);
-            filterPeopleResults.addAll(filterResults.second);
+            if (searchView.getQuery().toString().equals("")) {
+                Pair<List<Event>, List<Person>> filterResults = DataCache.getInstance().searchFilter("");
+                filterEventResults.addAll(filterResults.first);
+                filterPeopleResults.addAll(filterResults.second);
 
-            SearchAdapter searchAdapter = new SearchAdapter(filterEventResults, filterPeopleResults);
-            searchRecycler.setAdapter(searchAdapter);
+                SearchAdapter searchAdapter = new SearchAdapter(filterEventResults, filterPeopleResults);
+                searchRecycler.setAdapter(searchAdapter);
+            }
+
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String queryString) {
+                    Pair<List<Event>, List<Person>> filterResults = DataCache.getInstance().searchFilter(queryString);
+                    filterEventResults.addAll(filterResults.first);
+                    filterPeopleResults.addAll(filterResults.second);
+
+                    SearchAdapter searchAdapter = new SearchAdapter(filterEventResults, filterPeopleResults);
+                    searchRecycler.setAdapter(searchAdapter);
+
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String queryString) {
+                    Pair<List<Event>, List<Person>> filterResults = DataCache.getInstance().searchFilter(queryString);
+                    filterEventResults.clear();
+                    filterPeopleResults.clear();
+
+                    filterEventResults.addAll(filterResults.first);
+                    filterPeopleResults.addAll(filterResults.second);
+
+                    SearchAdapter searchAdapter = new SearchAdapter(filterEventResults, filterPeopleResults);
+                    searchRecycler.setAdapter(searchAdapter);
+
+                    return false;
+                }
+            });
         }
-
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String queryString) {
-                Pair<List<Event>, List<Person>> filterResults = DataCache.getInstance().searchFilter(queryString);
-                filterEventResults.addAll(filterResults.first);
-                filterPeopleResults.addAll(filterResults.second);
-
-                SearchAdapter searchAdapter = new SearchAdapter(filterEventResults, filterPeopleResults);
-                searchRecycler.setAdapter(searchAdapter);
-
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String queryString) {
-                Pair<List<Event>, List<Person>> filterResults = DataCache.getInstance().searchFilter(queryString);
-                filterEventResults.clear();
-                filterPeopleResults.clear();
-
-                filterEventResults.addAll(filterResults.first);
-                filterPeopleResults.addAll(filterResults.second);
-
-                SearchAdapter searchAdapter = new SearchAdapter(filterEventResults, filterPeopleResults);
-                searchRecycler.setAdapter(searchAdapter);
-
-                return false;
-            }
-        });
     }
 
     private class SearchAdapter extends RecyclerView.Adapter<searchViewHolder> {
@@ -104,7 +102,7 @@ public class SearchActivity extends AppCompatActivity {
         public searchViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view;
 
-            if(viewType == SEARCH_EVENT_ITEM_VIEW_TYPE) {
+            if (viewType == SEARCH_EVENT_ITEM_VIEW_TYPE) {
                 view = getLayoutInflater().inflate(R.layout.event_item, parent, false);
             } else {
                 view = getLayoutInflater().inflate(R.layout.family_members, parent, false);
@@ -114,7 +112,7 @@ public class SearchActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull searchViewHolder holder, int position) {
-            if(position < searchedEvents.size()) {
+            if (position < searchedEvents.size()) {
                 holder.bind(searchedEvents.get(position));
             } else {
                 holder.bind(searchedPeople.get(position - searchedEvents.size()));
@@ -127,7 +125,7 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
-    private class searchViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    private class searchViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private final TextView name;
         private final int viewType;
         private Event currentEvent;
@@ -141,7 +139,7 @@ public class SearchActivity extends AppCompatActivity {
 
             itemView.setOnClickListener(this);
 
-            if(viewType == SEARCH_EVENT_ITEM_VIEW_TYPE) {
+            if (viewType == SEARCH_EVENT_ITEM_VIEW_TYPE) {
                 name = itemView.findViewById(R.id.eventItem);
             } else {
                 name = itemView.findViewById(R.id.familyMember);
@@ -179,7 +177,7 @@ public class SearchActivity extends AppCompatActivity {
 
         @Override
         public void onClick(View view) {
-            if(viewType == SEARCH_EVENT_ITEM_VIEW_TYPE) {
+            if (viewType == SEARCH_EVENT_ITEM_VIEW_TYPE) {
                 Intent eventIntent = new Intent(SearchActivity.this, EventActivity.class);
                 eventIntent.putExtra("eventID", currentEvent.getEventID());
                 eventIntent.putExtra("eventInfo", newEventActivityInfo);

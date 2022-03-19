@@ -12,6 +12,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,7 +27,6 @@ public class PersonActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_person);
-
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -43,20 +43,33 @@ public class PersonActivity extends AppCompatActivity {
         Person markerPerson = DataCache.getInstance().getFamilyPeople().get(personID);
 
         assert markerPerson != null;
-        List<Event> actualEvents = DataCache.getInstance().getPersonEvents().get(markerPerson.getPersonID());
+        List<Event> settingEvents = DataCache.getInstance().settingsUpdate();
+        List<Event> currentPersonEvents = DataCache.getInstance().getPersonEvents().get(markerPerson.getPersonID());
+        List<Event> actualEvents = new ArrayList<>();
 
+        for(Event currentEvent : settingEvents) {
+            assert currentPersonEvents != null;
+            if(currentPersonEvents.contains(currentEvent)) {
+                actualEvents.add(currentEvent);
+            }
+        }
+        //List<Event> actualEvents = DataCache.getInstance().getPersonEvents().get(markerPerson.getPersonID());
         List<Pair<String, Person>> familyTree = new LinkedList<>();
 
-        if (markerPerson.getFatherID() != null) {
-            familyTree.add(new Pair<>("Father", DataCache.getInstance().getFamilyPeople().get(markerPerson.getFatherID())));
-        } else {
-            familyTree.add(new Pair<>("Father", null));
+        if(DataCache.getSettings().maleEvents) {
+            if (markerPerson.getFatherID() != null) {
+                familyTree.add(new Pair<>("Father", DataCache.getInstance().getFamilyPeople().get(markerPerson.getFatherID())));
+            } else {
+                familyTree.add(new Pair<>("Father", null));
+            }
         }
 
-        if (markerPerson.getMotherID() != null) {
-            familyTree.add(new Pair<>("Mother", DataCache.getInstance().getFamilyPeople().get(markerPerson.getMotherID())));
-        } else {
-            familyTree.add(new Pair<>("Mother", null));
+        if(DataCache.getSettings().femaleEvents) {
+            if (markerPerson.getMotherID() != null) {
+                familyTree.add(new Pair<>("Mother", DataCache.getInstance().getFamilyPeople().get(markerPerson.getMotherID())));
+            } else {
+                familyTree.add(new Pair<>("Mother", null));
+            }
         }
 
         if (markerPerson.getSpouseID() != null) {

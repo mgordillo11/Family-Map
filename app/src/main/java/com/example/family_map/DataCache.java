@@ -52,6 +52,24 @@ public class DataCache {
 
     public boolean userLoggedIn = false;
 
+    public void resetSettings() {
+        settings.familyTreeLines = true;
+        settings.lifeStoryLines = true;
+        settings.spouseLines = true;
+        settings.fatherSide = true;
+        settings.motherSide = true;
+        settings.maleEvents = true;
+        settings.femaleEvents = true;
+        familyPeople = new HashMap<>();
+        familyEvents = new HashMap<>();
+        personEvents = new HashMap<>();
+        userFamily = new HashMap<>();
+        paternalAncestors = new ArrayList<>();
+        maternalAncestors = new ArrayList<>();
+        maleEvents = new ArrayList<>();
+        femaleEvents = new ArrayList<>();
+    }
+
     public List<Event> settingsUpdate() {
         if (settings.femaleEvents && settings.maleEvents && settings.motherSide && settings.fatherSide) {
             List<Event> updatedEvents = new ArrayList<>();
@@ -84,26 +102,18 @@ public class DataCache {
             return getEventOfParentSideByGender("f", "Mom");
         }
 
-        /*
-        if (settings.femaleEvents && settings.motherSide && settings.maleEvents) {
-            ArrayList<Event> tempArrayList = new ArrayList<>();
-            tempArrayList.addAll(getEventOfParentSideByGender("f", "Mom"));
-            tempArrayList.addAll(getEventOfParentSideByGender("m", "Mom"));
-            return tempArrayList;
-        }
-
-        if (settings.femaleEvents && settings.fatherSide && settings.maleEvents) {
-            ArrayList<Event> tempArrayList = new ArrayList<>();
-            tempArrayList.addAll(getEventOfParentSideByGender("f", "Dad"));
-            tempArrayList.addAll(getEventOfParentSideByGender("m", "Dad"));
-            return tempArrayList;
-        }*/
-
         if (!settings.maleEvents && !settings.femaleEvents) {
             return null;
         }
+
         if (!settings.motherSide && !settings.fatherSide) {
-            return null;
+            List<Event> currentUserEvents = new ArrayList<>();
+            currentUserEvents.addAll(getInstance().getPersonEvents().get(currentPerson.getPersonID()));
+
+            if(currentPerson.getSpouseID() != null) {
+                currentUserEvents.addAll(getInstance().getPersonEvents().get(currentPerson.getSpouseID()));
+            }
+            return currentUserEvents;
         }
 
         return null;
@@ -146,8 +156,8 @@ public class DataCache {
         int earliestYear = currentEarliestEvents.get(0).getYear();
         Event earliestEvent = currentEarliestEvents.get(0);
 
-        for(int i = 0; i < currentEarliestEvents.size(); i++) {
-            if(earliestYear > currentEarliestEvents.get(i).getYear()) {
+        for (int i = 0; i < currentEarliestEvents.size(); i++) {
+            if (earliestYear > currentEarliestEvents.get(i).getYear()) {
                 earliestYear = currentEarliestEvents.get(i).getYear();
                 earliestEvent = currentEarliestEvents.get(i);
             }
@@ -167,12 +177,16 @@ public class DataCache {
     }
 
     public Pair<List<Event>, List<Person>> searchFilter(String searchString) {
-        List<Event> dataEvents = new ArrayList<>();
+        //Generates the events allows by what the user has chosen to pop up
+        List<Event> dataEvents = new ArrayList<>(DataCache.getInstance().settingsUpdate());
         List<Person> dataPeople = new ArrayList<>();
 
-        for (Map.Entry<String, Event> currentEvent : DataCache.getInstance().getEvents().entrySet()) {
-            dataEvents.add(currentEvent.getValue());
-        }
+        /*for (Event currentEvent : dataEvents) {
+            Person eventRelatedPerson = DataCache.getInstance().familyPeople.get(currentEvent.getPersonID());
+            if(!dataPeople.contains(eventRelatedPerson)) {
+                dataPeople.add(eventRelatedPerson);
+            }
+        }*/
 
         for (Map.Entry<String, Person> currentPerson : DataCache.getInstance().getFamilyPeople().entrySet()) {
             dataPeople.add(currentPerson.getValue());

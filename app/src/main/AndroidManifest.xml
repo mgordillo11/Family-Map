@@ -27,10 +27,13 @@
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".EventActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:configChanges="orientation|screenSize"
+            android:parentActivityName=".MainActivity"/>
         <activity
             android:name=".PersonActivity"
             android:exported="false"
+            android:configChanges="orientation|screenSize"
             android:parentActivityName=".MainActivity" />
         <!--
              TODO: Before you run your application, you need a Google Maps API key.

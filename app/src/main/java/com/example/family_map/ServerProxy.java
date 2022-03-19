@@ -23,12 +23,7 @@ import RequestResponse.PersonResponse;
 import RequestResponse.RegisterRequest;
 import RequestResponse.RegisterResponse;
 
-public class ServerProxy { //ServerFacade nickname
-    public static void main(String[] args) {
-        String serverHost = args[0];
-        String serverPort = args[1];
-    }
-
+public class ServerProxy {
     public static boolean postRegisterUser(String serverHost, String serverPort, RegisterRequest registerRequest) {
         Gson gson = new Gson();
         boolean currentStatus;
