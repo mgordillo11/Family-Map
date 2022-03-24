@@ -2,6 +2,9 @@ package com.example.family_map;
 
 import android.util.Pair;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +37,9 @@ public class DataCache {
         maleEvents = new ArrayList<>();
         femaleEvents = new ArrayList<>();
     }
+
+    public Event currentClickedEvent = null;
+    public String currentClickedMarkerInfo = null;
 
     private Map<String, Person> familyPeople; //Get's a person based on their personID
     private Map<String, Event> familyEvents; //Get an event based on their event ID

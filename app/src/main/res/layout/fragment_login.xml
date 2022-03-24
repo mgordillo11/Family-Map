@@ -61,7 +61,7 @@
                 android:layout_height="wrap_content"
                 android:layout_span="2"
                 android:inputType="text"
-                android:text="Manny"
+                android:text="sheila"
                 tools:text="Test-User" />
         </TableRow>
 
@@ -79,7 +79,7 @@
                 android:layout_height="wrap_content"
                 android:layout_span="2"
                 android:inputType="textPassword"
-                android:text="p"
+                android:text="parker"
                 tools:text="Test-Password" />
         </TableRow>
 

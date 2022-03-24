@@ -13,6 +13,9 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -46,17 +49,43 @@ public class PersonActivity extends AppCompatActivity {
         List<Event> settingEvents = DataCache.getInstance().settingsUpdate();
         List<Event> currentPersonEvents = DataCache.getInstance().getPersonEvents().get(markerPerson.getPersonID());
         List<Event> actualEvents = new ArrayList<>();
+        ArrayList<Integer> eventYears = new ArrayList<>();
 
-        for(Event currentEvent : settingEvents) {
+        for (Event currentEvent : settingEvents) {
             assert currentPersonEvents != null;
-            if(currentPersonEvents.contains(currentEvent)) {
+            if (currentPersonEvents.contains(currentEvent)) {
                 actualEvents.add(currentEvent);
+                eventYears.add(currentEvent.getYear());
             }
         }
+
+        /*
+        List<Event> orderedActualEvents = new ArrayList<>();
+        List<Integer> orderedYears = new ArrayList<>();
+
+        int tempYear = actualEvents.get(0).getYear();
+        for (int i = 0; i < actualEvents.size(); i++) {
+            int currentEarliestYear = actualEvents.get(i).getYear();
+            Event currentEarliestEvent = actualEvents.get(i);
+
+            for (int j = 0; j < actualEvents.size(); j++) {
+                if (actualEvents.get(j).getYear() < currentEarliestYear && !orderedYears.contains(actualEvents.get(j).getYear())
+                && actualEvents.get(j).getYear() > tempYear) {
+                    currentEarliestYear = actualEvents.get(j).getYear();
+                    currentEarliestEvent = actualEvents.get(j);
+                    tempYear = currentEarliestYear;
+                }
+            }
+            orderedYears.add(currentEarliestYear);
+            orderedActualEvents.add(currentEarliestEvent);
+        }
+
+        orderedActualEvents.add(actualEvents.get(actualEvents.size() - 1));*/
+
         //List<Event> actualEvents = DataCache.getInstance().getPersonEvents().get(markerPerson.getPersonID());
         List<Pair<String, Person>> familyTree = new LinkedList<>();
 
-        if(DataCache.getSettings().maleEvents) {
+        if (DataCache.getSettings().maleEvents) {
             if (markerPerson.getFatherID() != null) {
                 familyTree.add(new Pair<>("Father", DataCache.getInstance().getFamilyPeople().get(markerPerson.getFatherID())));
             } else {
@@ -64,7 +93,7 @@ public class PersonActivity extends AppCompatActivity {
             }
         }
 
-        if(DataCache.getSettings().femaleEvents) {
+        if (DataCache.getSettings().femaleEvents) {
             if (markerPerson.getMotherID() != null) {
                 familyTree.add(new Pair<>("Mother", DataCache.getInstance().getFamilyPeople().get(markerPerson.getMotherID())));
             } else {

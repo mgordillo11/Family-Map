@@ -41,11 +41,49 @@ public class MapsFragment extends Fragment {
     private String currentGender;
     private String eventID;
     private String zoomedEvent;
-    private List<Polyline> currentPolyLines = new ArrayList<>();
-    private Map<String, Event> mapEvents;
+    private final List<Polyline> currentPolyLines = new ArrayList<>();
+    private final Map<String, Event> mapEvents;
+    private final List<Float> colors = new ArrayList<>();
+    private Map<String, Float> uniqueEventMarker = new HashMap<>();
+    private final List<Float> usedMarkerColors = new ArrayList<>();
 
     public MapsFragment() {
         this.mapEvents = new HashMap<>();
+
+
+        /*
+        uniqueEventMarker.put("birth", BitmapDescriptorFactory.HUE_MAGENTA);
+        uniqueEventMarker.put("marriage", BitmapDescriptorFactory.HUE_MAGENTA);
+        uniqueEventMarker.put("event", BitmapDescriptorFactory.HUE_MAGENTA);*/
+
+        colors.add(BitmapDescriptorFactory.HUE_BLUE);
+        colors.add(BitmapDescriptorFactory.HUE_ORANGE);
+        colors.add(BitmapDescriptorFactory.HUE_ROSE);
+        colors.add(BitmapDescriptorFactory.HUE_GREEN);
+        colors.add(BitmapDescriptorFactory.HUE_AZURE);
+        colors.add(BitmapDescriptorFactory.HUE_CYAN);
+        colors.add(BitmapDescriptorFactory.HUE_MAGENTA);
+        colors.add(BitmapDescriptorFactory.HUE_RED);
+        colors.add(BitmapDescriptorFactory.HUE_VIOLET);
+        colors.add(BitmapDescriptorFactory.HUE_YELLOW);
+    }
+
+
+    private Float getUniqueMarkerColor(String eventType) {
+        Float uniqueColor = null;
+        if (uniqueEventMarker.containsKey(eventType)) {
+            return uniqueEventMarker.get(eventType);
+        }
+
+        for (Float currentColor : colors) {
+            if (!usedMarkerColors.contains(currentColor)) {
+                usedMarkerColors.add(currentColor);
+                uniqueEventMarker.put(eventType, currentColor);
+                uniqueColor = currentColor;
+                break;
+            }
+        }
+        return uniqueColor;
     }
 
     private final OnMapReadyCallback callback = new OnMapReadyCallback() {
@@ -75,11 +113,7 @@ public class MapsFragment extends Fragment {
                     for (Event femaleEvents : DataCache.getInstance().getFemaleEvents()) {
                         mapEvents.put(femaleEvents.getEventID(), femaleEvents);
                     }
-                    // mapEvents.addAll(DataCache.getInstance().getMaleEvents());
-                    //mapEvents.addAll(DataCache.getInstance().getFemaleEvents());
                 } else {
-                    //mapEvents.addAll(DataCache.getInstance().settingsUpdate());
-                    List<Event> temp = DataCache.getInstance().settingsUpdate();
                     for (Event settingEvents : DataCache.getInstance().settingsUpdate()) {
                         mapEvents.put(settingEvents.getEventID(), settingEvents);
                     }
@@ -89,7 +123,8 @@ public class MapsFragment extends Fragment {
                     float color;
 
                     Event eventEntry = event.getValue();
-                    switch (eventEntry.getEventType().toLowerCase()) {
+                    color = getUniqueMarkerColor(eventEntry.getEventType().toLowerCase());
+                    /*switch (eventEntry.getEventType().toLowerCase()) {
                         case "birth":
                             color = BitmapDescriptorFactory.HUE_MAGENTA;
                             break;
@@ -100,9 +135,10 @@ public class MapsFragment extends Fragment {
                             color = BitmapDescriptorFactory.HUE_GREEN;
                             break;
                         default:
-                            color = BitmapDescriptorFactory.HUE_CYAN;
+                            color = getUniqueMarkerColor(eventEntry.getEventType().toLowerCase());
+                            //color = BitmapDescriptorFactory.HUE_YELLOW;
                             break;
-                    }
+                    }*/
 
                     Person currentPerson = DataCache.getInstance().getFamilyPeople().get(eventEntry.getPersonID());
 
@@ -137,16 +173,21 @@ public class MapsFragment extends Fragment {
                                 detailedView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.baseline_woman_24, 0, 0);
                             }
 
-                            //Event clickedMarkerEvent = DataCache.getInstance().getEvents().get(markerData.get(2));
                             Event clickedMarkerEvent = mapEvents.get(markerData.get(2));
+                            DataCache.getInstance().currentClickedEvent = clickedMarkerEvent;
+
+                            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(
+                                    clickedMarkerEvent.getLatitude(), clickedMarkerEvent.getLongitude()
+                            ), 2));
+
                             Person currentPerson = DataCache.getInstance().getFamilyPeople().get(currentPersonID);
 
                             if (currentPerson.getSpouseID() != null && DataCache.getSettings().spouseLines) {
                                 Person currentSpouse = DataCache.getInstance().getFamilyPeople().get(currentPerson.getSpouseID());
                                 Event testEvent = null;
 
-                                for(Map.Entry<String, Event> tempEvent : mapEvents.entrySet()) {
-                                    if(tempEvent.getValue().getPersonID().equals(currentSpouse.getPersonID())) {
+                                for (Map.Entry<String, Event> tempEvent : mapEvents.entrySet()) {
+                                    if (tempEvent.getValue().getPersonID().equals(currentSpouse.getPersonID())) {
                                         testEvent = tempEvent.getValue();
                                         break;
                                     }
@@ -193,10 +234,10 @@ public class MapsFragment extends Fragment {
                             }
 
                             if (DataCache.getSettings().familyTreeLines) {
-                                assert clickedMarkerEvent != null;
                                 addFamilyTreeLines(googleMap, clickedMarkerEvent.getEventID(), 20, currentPolyLines);
                             }
 
+                            DataCache.getInstance().currentClickedMarkerInfo = marker.getTitle();
                             detailedView.setText(marker.getTitle());
                             return true;
                         }
@@ -205,20 +246,124 @@ public class MapsFragment extends Fragment {
 
                 if (eventID != null) {
                     Event markerPressedEvent = DataCache.getInstance().getEvents().get(eventID);
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(
+                            markerPressedEvent.getLatitude(), markerPressedEvent.getLongitude()
+                    ), 2));
 
-                    assert markerPressedEvent != null;
-                    LatLng markerLocation = new LatLng(markerPressedEvent.getLatitude(), markerPressedEvent.getLongitude());
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(markerLocation, 10));
+//                    LatLng markerLocation = new LatLng(markerPressedEvent.getLatitude(), markerPressedEvent.getLongitude());
+//                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(markerLocation, 5));
+
+                    for (Polyline currentLine : currentPolyLines) {
+                        currentLine.remove();
+                    }
+                    currentPolyLines.clear();
+
+                    Person personRelatedToEvent = DataCache.getInstance().getFamilyPeople().get(markerPressedEvent.getPersonID());
+
+                    assert personRelatedToEvent != null;
+                    currentPersonID = personRelatedToEvent.getPersonID();
+                    currentGender = personRelatedToEvent.getGender();
+
+                    if (currentGender.equals("m")) {
+                        detailedView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.baseline_man_24, 0, 0);
+                    } else {
+                        detailedView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.baseline_woman_24, 0, 0);
+                    }
+
+                    //Event clickedMarkerEvent = mapEvents.get(markerPressedEvent.getEventID());
+                    Person currentPerson = DataCache.getInstance().getFamilyPeople().get(currentPersonID);
+
+                    Person currentSpouse = DataCache.getInstance().getFamilyPeople().get(currentPerson.getSpouseID());
+                    Event testEvent = null;
+
+                    for (Map.Entry<String, Event> tempEvent : DataCache.getInstance().getEvents().entrySet()) {
+                        if (tempEvent.getValue().getPersonID().equals(currentSpouse.getPersonID())) {
+                            testEvent = tempEvent.getValue();
+                            break;
+                        }
+                    }
+
+                    if (testEvent != null) {
+                        List<Event> spouseEvents = DataCache.getInstance().getPersonEvents().get(currentSpouse.getPersonID());
+                        int earliestEvent = spouseEvents.get(0).getYear();
+                        Event spouseEarliestEvent = spouseEvents.get(0);
+
+                        for (int i = 0; i < spouseEvents.size(); i++) {
+                            if (earliestEvent > spouseEvents.get(i).getYear()) {
+                                earliestEvent = spouseEvents.get(i).getYear();
+                                spouseEarliestEvent = spouseEvents.get(i);
+                            }
+                        }
+
+                        LatLng spouseLatLng = new LatLng(spouseEarliestEvent.getLatitude(), spouseEarliestEvent.getLongitude());
+                        LatLng personLatLng = new LatLng(markerPressedEvent.getLatitude(), markerPressedEvent.getLongitude());
+
+                        currentPolyLines.add(googleMap.addPolyline(new PolylineOptions().clickable(false).add(spouseLatLng, personLatLng).color(Color.RED)));
+                    }
+
+                    List<Event> currentPersonEvents = DataCache.getInstance().getPersonEvents().get(currentPerson.getPersonID());
+                    List<LatLng> eventLocations = new ArrayList<>();
+
+                    int earliestEvent = currentPersonEvents.get(0).getYear();
+
+                    for (int i = 0; i < currentPersonEvents.size(); i++) {
+                        LatLng currentLatLng = new LatLng(currentPersonEvents.get(i).getLatitude(),
+                                currentPersonEvents.get(i).getLongitude());
+
+                        if (earliestEvent > currentPersonEvents.get(i).getYear()) {
+                            eventLocations.add(currentLatLng);
+                        } else {
+                            eventLocations.add(currentLatLng);
+                        }
+                    }
+
+                    currentPolyLines.add(googleMap.addPolyline(new PolylineOptions().clickable(false).addAll(eventLocations).color(Color.BLUE)));
+
+                    //assert markerPressedEvent != null;
+                    addFamilyTreeLines(googleMap, markerPressedEvent.getEventID(), 20, currentPolyLines);
 
                     detailedView.setText(zoomedEvent);
                 }
+
+                if (DataCache.getInstance().currentClickedEvent != null && eventID == null) {
+                    if (DataCache.getInstance().settingsUpdate().contains(DataCache.getInstance().currentClickedEvent)) {
+                        LatLng clickedLatLng = new LatLng(DataCache.getInstance().currentClickedEvent.getLatitude(),
+                                DataCache.getInstance().currentClickedEvent.getLongitude());
+
+                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(clickedLatLng, 2));
+
+                        Person clickedPerson = DataCache.getInstance().getFamilyPeople()
+                                .get(DataCache.getInstance().currentClickedEvent.getPersonID());
+
+                        if (clickedPerson.getGender().equals("m")) {
+                            detailedView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.baseline_man_24, 0, 0);
+                        } else {
+                            detailedView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.baseline_woman_24, 0, 0);
+                        }
+
+                        detailedView.setText(DataCache.getInstance().currentClickedMarkerInfo);
+                    }
+                }
             }
-            System.out.println("Test");
         }
     };
 
     public void addFamilyTreeLines(GoogleMap googleMap, String currentEventID, int currentPolylineWidth, List<Polyline> currentPolyLines) {
-        Event currentEvent = DataCache.getInstance().getEvents().get(currentEventID);
+        //Event currentEvent = DataCache.getInstance().getEvents().get(currentEventID);
+
+        Event currentEvent = null;
+        List<Event> filteredEvents = DataCache.getInstance().settingsUpdate();
+
+        for (Event event : filteredEvents) {
+            if (event.getEventID().equals(currentEventID)) {
+                currentEvent = event;
+            }
+        }
+
+        if(currentEvent == null) {
+            return;
+        }
+
         Person currentPerson = DataCache.getInstance().getFamilyPeople().get(currentEvent.getPersonID());
 
         Event earliestMotherEvent = null;
@@ -228,16 +373,19 @@ public class MapsFragment extends Fragment {
             earliestMotherEvent = DataCache.getInstance().getEarliestEvent(currentPerson.getMotherID());
             earliestFatherEvent = DataCache.getInstance().getEarliestEvent(currentPerson.getFatherID());
 
-            List<LatLng> currentMotherSide = new ArrayList<>();
-            currentMotherSide.add(new LatLng(currentEvent.getLatitude(), currentEvent.getLongitude()));
-            currentMotherSide.add(new LatLng(earliestMotherEvent.getLatitude(), earliestMotherEvent.getLongitude()));
+            if(DataCache.getSettings().femaleEvents) {
+                List<LatLng> currentMotherSide = new ArrayList<>();
+                currentMotherSide.add(new LatLng(currentEvent.getLatitude(), currentEvent.getLongitude()));
+                currentMotherSide.add(new LatLng(earliestMotherEvent.getLatitude(), earliestMotherEvent.getLongitude()));
+                currentPolyLines.add(googleMap.addPolyline(new PolylineOptions().clickable(false).addAll(currentMotherSide).color(Color.CYAN).width(currentPolylineWidth)));
+            }
 
-            List<LatLng> currentFatherSide = new ArrayList<>();
-            currentFatherSide.add(new LatLng(currentEvent.getLatitude(), currentEvent.getLongitude()));
-            currentFatherSide.add(new LatLng(earliestFatherEvent.getLatitude(), earliestFatherEvent.getLongitude()));
-
-            currentPolyLines.add(googleMap.addPolyline(new PolylineOptions().clickable(false).addAll(currentMotherSide).color(Color.CYAN).width(currentPolylineWidth)));
-            currentPolyLines.add(googleMap.addPolyline(new PolylineOptions().clickable(false).addAll(currentFatherSide).color(Color.CYAN).width(currentPolylineWidth)));
+            if(DataCache.getSettings().maleEvents) {
+                List<LatLng> currentFatherSide = new ArrayList<>();
+                currentFatherSide.add(new LatLng(currentEvent.getLatitude(), currentEvent.getLongitude()));
+                currentFatherSide.add(new LatLng(earliestFatherEvent.getLatitude(), earliestFatherEvent.getLongitude()));
+                currentPolyLines.add(googleMap.addPolyline(new PolylineOptions().clickable(false).addAll(currentFatherSide).color(Color.CYAN).width(currentPolylineWidth)));
+            }
         }
 
         if (currentPerson.getMotherID() != null) {

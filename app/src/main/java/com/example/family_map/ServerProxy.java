@@ -74,6 +74,7 @@ public class ServerProxy {
                 //Populates the father side of the current user
                 DataCache.getInstance().getFamilySide(DataCache.getInstance().getCurrentPerson(), "Dad");
 
+                DataCache.getInstance().userLoggedIn = true;
                 return currentStatus;
             } else {
                 System.out.println("ERROR: " + http.getResponseMessage());
@@ -83,6 +84,7 @@ public class ServerProxy {
                 String respData = readString(respBody);
                 // Display the data returned from the server
                 System.out.println(respData);
+                DataCache.getInstance().userLoggedIn = false;
                 return false;
             }
 
@@ -141,6 +143,7 @@ public class ServerProxy {
                 //Populates the father side of the current user
                 DataCache.getInstance().getFamilySide(DataCache.getInstance().getCurrentPerson(), "Dad");
 
+                DataCache.getInstance().userLoggedIn = true;
                 return currentStatus;
             } else {
                 System.out.println("ERROR: " + httpURLConnection.getResponseMessage());
@@ -153,6 +156,8 @@ public class ServerProxy {
 
                 // Display the data returned from the server
                 System.out.println(respData);
+
+                DataCache.getInstance().userLoggedIn = false;
                 return false;
             }
 
