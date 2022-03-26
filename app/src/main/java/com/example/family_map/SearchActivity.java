@@ -34,7 +34,8 @@ public class SearchActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        if(DataCache.getSettings().maleEvents || DataCache.getSettings().femaleEvents) {
+        //Only displays the recycler if one of the two event settings are on
+        if (DataCache.getSettings().maleEvents || DataCache.getSettings().femaleEvents) {
             RecyclerView searchRecycler = findViewById(R.id.RecyclerView);
             searchRecycler.setLayoutManager(new LinearLayoutManager(SearchActivity.this));
 
@@ -56,6 +57,9 @@ public class SearchActivity extends AppCompatActivity {
                 @Override
                 public boolean onQueryTextSubmit(String queryString) {
                     Pair<List<Event>, List<Person>> filterResults = DataCache.getInstance().searchFilter(queryString);
+                    filterEventResults.clear();
+                    filterPeopleResults.clear();
+
                     filterEventResults.addAll(filterResults.first);
                     filterPeopleResults.addAll(filterResults.second);
 
@@ -126,10 +130,9 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private class searchViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private final TextView name;
+        private final TextView currentTextView;
         private final int viewType;
         private Event currentEvent;
-        private Person currentPerson;
         private String newEventActivityInfo;
         private String currentPersonID;
 
@@ -140,38 +143,38 @@ public class SearchActivity extends AppCompatActivity {
             itemView.setOnClickListener(this);
 
             if (viewType == SEARCH_EVENT_ITEM_VIEW_TYPE) {
-                name = itemView.findViewById(R.id.eventItem);
+                currentTextView = itemView.findViewById(R.id.eventItem);
             } else {
-                name = itemView.findViewById(R.id.familyMember);
+                currentTextView = itemView.findViewById(R.id.familyMember);
             }
 
         }
 
         private void bind(Event event) {
             this.currentEvent = event;
-            Person currentPerson = DataCache.getInstance().getFamilyPeople().get(event.getPersonID());
+            Person currentPerson = DataCache.getInstance().getPersonMap().get(event.getPersonID());
 
-            String eventItemText = currentEvent.getEventType().toUpperCase() + ": " + currentEvent.getCity() + "," + currentEvent.getCountry()
-                    + "(" + currentEvent.getYear() + ")\n" + currentPerson.getFirstName() + " " + currentPerson.getLastName();
+            String eventItemText = currentEvent.getEventType().toUpperCase() + ": "
+                    + currentEvent.getCity() + "," + currentEvent.getCountry()
+                    + "(" + currentEvent.getYear() + ")\n" + currentPerson.getFirstName() + " "
+                    + currentPerson.getLastName();
 
             newEventActivityInfo = currentPerson.getFirstName() + " " + currentPerson.getLastName() +
-                    "\n" + event.getEventType().toUpperCase() + ": " + event.getCity() + "," + event.getCountry()
-                    + "(" + event.getYear() + ")";
+                    "\n" + event.getEventType().toUpperCase() + ": " + event.getCity()
+                    + "," + event.getCountry() + "(" + event.getYear() + ")";
 
-            name.setText(eventItemText);
+            currentTextView.setText(eventItemText);
         }
 
         private void bind(Person person) {
-            this.currentPerson = person;
             currentPersonID = person.getPersonID();
-
             String familyMemberInfo = person.getFirstName() + " " + person.getLastName() + "\n";
 
-            name.setText(familyMemberInfo);
+            currentTextView.setText(familyMemberInfo);
             if (person.getGender().equals("m")) {
-                name.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_man_24, 0, 0, 0);
+                currentTextView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_man_24, 0, 0, 0);
             } else {
-                name.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_woman_24, 0, 0, 0);
+                currentTextView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_woman_24, 0, 0, 0);
             }
         }
 

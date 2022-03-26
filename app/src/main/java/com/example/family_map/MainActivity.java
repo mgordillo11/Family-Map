@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
             fragmentManager.beginTransaction().add(R.id.loginFragment, loginFragment).commit();
         } else {
             if (loginFragment instanceof LoginFragment) {
-                ((LoginFragment) loginFragment).registerListener(this);
+                ((LoginFragment) loginFragment).loginRegisterListener(this);
             }
         }
     }

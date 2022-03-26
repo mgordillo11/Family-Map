@@ -1,7 +1,6 @@
 package com.example.family_map;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -64,34 +63,31 @@ public class SettingsActivity extends AppCompatActivity {
             maleEvents.setChecked(DataCache.getSettings().maleEvents);
             femaleEvents.setChecked(DataCache.getSettings().femaleEvents);
 
-            getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
-                @Override
-                public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-                    switch (s) {
-                        case "life_story_lines":
-                            DataCache.getSettings().lifeStoryLines = lifeStoryLines.isChecked();
-                            break;
-                        case "family_tree_lines":
-                            DataCache.getSettings().familyTreeLines = familyTreeLines.isChecked();
-                            break;
-                        case "spouse_lines":
-                            DataCache.getSettings().spouseLines = spouseLines.isChecked();
-                            break;
-                        case "father_side":
-                            DataCache.getSettings().fatherSide = fatherSide.isChecked();
-                            break;
-                        case "mother_side":
-                            DataCache.getSettings().motherSide = motherSide.isChecked();
-                            break;
-                        case "male_events":
-                            DataCache.getSettings().maleEvents = maleEvents.isChecked();
-                            break;
-                        case "female_events":
-                            DataCache.getSettings().femaleEvents = femaleEvents.isChecked();
-                            break;
-                        default:
-                            break;
-                    }
+            getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener((sharedPreferences, s) -> {
+                switch (s) {
+                    case "life_story_lines":
+                        DataCache.getSettings().lifeStoryLines = lifeStoryLines.isChecked();
+                        break;
+                    case "family_tree_lines":
+                        DataCache.getSettings().familyTreeLines = familyTreeLines.isChecked();
+                        break;
+                    case "spouse_lines":
+                        DataCache.getSettings().spouseLines = spouseLines.isChecked();
+                        break;
+                    case "father_side":
+                        DataCache.getSettings().fatherSide = fatherSide.isChecked();
+                        break;
+                    case "mother_side":
+                        DataCache.getSettings().motherSide = motherSide.isChecked();
+                        break;
+                    case "male_events":
+                        DataCache.getSettings().maleEvents = maleEvents.isChecked();
+                        break;
+                    case "female_events":
+                        DataCache.getSettings().femaleEvents = femaleEvents.isChecked();
+                        break;
+                    default:
+                        break;
                 }
             });
         }

@@ -24,11 +24,12 @@ public class EventActivity extends AppCompatActivity {
 
         FragmentManager fragmentManager = this.getSupportFragmentManager();
 
-        Bundle bundle = new Bundle();
-        bundle.putString("eventID", eventID);
-        bundle.putString("eventInfo", eventInfo);
+        Bundle eventBundle = new Bundle();
+        eventBundle.putString("eventID", eventID);
+        eventBundle.putString("eventInfo", eventInfo);
+
         MapsFragment eventMapFragment = new MapsFragment();
-        eventMapFragment.setArguments(bundle);
+        eventMapFragment.setArguments(eventBundle);
 
         fragmentManager.beginTransaction().add(R.id.eventMap, eventMapFragment).commit();
     }

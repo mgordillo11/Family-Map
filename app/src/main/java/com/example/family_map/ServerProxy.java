@@ -48,17 +48,23 @@ public class ServerProxy {
 
                 RegisterResponse registerResponse = gson.fromJson(jsonResponse, RegisterResponse.class);
 
-                DataCache.getInstance().setCurrentAuthtoken(new Authtoken(registerResponse.getAuthtoken(), registerResponse.getUsername()));
+                DataCache.getInstance().setCurrentAuthtoken(new Authtoken(registerResponse.getAuthtoken(),
+                        registerResponse.getUsername()));
 
-                currentStatus = getPeopleByUser(serverHost, serverPort, DataCache.getInstance().getCurrentAuthtoken());
+                currentStatus = getPeopleByUser(serverHost, serverPort,
+                        DataCache.getInstance().getCurrentAuthtoken());
+
                 if (!currentStatus) {
                     return false;
                 }
-                currentStatus = getEventsByUser(serverHost, serverPort, DataCache.getInstance().getCurrentAuthtoken());
+
+                currentStatus = getEventsByUser(serverHost, serverPort,
+                        DataCache.getInstance().getCurrentAuthtoken());
 
                 //Populates both lists based on if the event was associated with a male or female
                 for (Map.Entry<String, Event> recentLoadedEvent : DataCache.getInstance().getEvents().entrySet()) {
-                    Person checkGenderEvent = DataCache.getInstance().getFamilyPeople().get(recentLoadedEvent.getValue().getPersonID());
+                    Person checkGenderEvent = DataCache.getInstance().getPersonMap()
+                            .get(recentLoadedEvent.getValue().getPersonID());
 
                     if (checkGenderEvent.getGender().equals("m")) {
                         DataCache.getInstance().getMaleEvents().add(recentLoadedEvent.getValue());
@@ -70,9 +76,17 @@ public class ServerProxy {
                 DataCache.getInstance().setCurrentPerson(getPersonViaID(registerResponse.getPersonID()));
 
                 //Populates the mother side of the current user
-                DataCache.getInstance().getFamilySide(DataCache.getInstance().getCurrentPerson(), "Mom");
+                Person currentUserMother = DataCache.getInstance().getPersonMap().
+                        get(DataCache.getInstance().getCurrentPerson().getMotherID());
+
+                Person currentUserFather = DataCache.getInstance().getPersonMap().
+                        get(DataCache.getInstance().getCurrentPerson().getFatherID());
+
+                //Populates the mother side of the current user
+                DataCache.getInstance().fillMaternalAncestors(currentUserMother);
+
                 //Populates the father side of the current user
-                DataCache.getInstance().getFamilySide(DataCache.getInstance().getCurrentPerson(), "Dad");
+                DataCache.getInstance().fillPaternalAncestors(currentUserFather);
 
                 DataCache.getInstance().userLoggedIn = true;
                 return currentStatus;
@@ -96,7 +110,7 @@ public class ServerProxy {
 
     public static boolean postLoginUser(String serverHost, String serverPort, LoginRequest loginRequest) {
         Gson gson = new Gson();
-        boolean currentStatus;
+        boolean currentResponseStatus;
 
         try {
             URL loginURL = new URL("http://" + serverHost + ":" + serverPort + "/user/login");
@@ -118,16 +132,21 @@ public class ServerProxy {
 
                 LoginResponse loginResponse = gson.fromJson(loginJson, LoginResponse.class);
 
-                DataCache.getInstance().setCurrentAuthtoken(new Authtoken(loginResponse.getAuthtoken(), loginResponse.getUsername()));
+                DataCache.getInstance().setCurrentAuthtoken(new Authtoken(loginResponse.getAuthtoken(),
+                        loginResponse.getUsername()));
 
-                currentStatus = getPeopleByUser(serverHost, serverPort, DataCache.getInstance().getCurrentAuthtoken());
-                if (!currentStatus) {
+                currentResponseStatus = getPeopleByUser(serverHost, serverPort,
+                        DataCache.getInstance().getCurrentAuthtoken());
+
+                if (!currentResponseStatus) {
                     return false;
                 }
-                currentStatus = getEventsByUser(serverHost, serverPort, DataCache.getInstance().getCurrentAuthtoken());
+                currentResponseStatus = getEventsByUser(serverHost, serverPort,
+                        DataCache.getInstance().getCurrentAuthtoken());
 
                 for (Map.Entry<String, Event> recentLoadedEvent : DataCache.getInstance().getEvents().entrySet()) {
-                    Person checkGenderEvent = DataCache.getInstance().getFamilyPeople().get(recentLoadedEvent.getValue().getPersonID());
+                    Person checkGenderEvent = DataCache.getInstance().getPersonMap()
+                            .get(recentLoadedEvent.getValue().getPersonID());
 
                     if (checkGenderEvent.getGender().equals("m")) {
                         DataCache.getInstance().getMaleEvents().add(recentLoadedEvent.getValue());
@@ -139,12 +158,19 @@ public class ServerProxy {
                 DataCache.getInstance().setCurrentPerson(getPersonViaID(loginResponse.getPersonID()));
 
                 //Populates the mother side of the current user
-                DataCache.getInstance().getFamilySide(DataCache.getInstance().getCurrentPerson(), "Mom");
+                Person currentUserMother = DataCache.getInstance().getPersonMap().
+                        get(DataCache.getInstance().getCurrentPerson().getMotherID());
+
+                Person currentUserFather = DataCache.getInstance().getPersonMap().
+                        get(DataCache.getInstance().getCurrentPerson().getFatherID());
+
+                //Populates the mother side of the current user
+                DataCache.getInstance().fillMaternalAncestors(currentUserMother);
                 //Populates the father side of the current user
-                DataCache.getInstance().getFamilySide(DataCache.getInstance().getCurrentPerson(), "Dad");
+                DataCache.getInstance().fillPaternalAncestors(currentUserFather);
 
                 DataCache.getInstance().userLoggedIn = true;
-                return currentStatus;
+                return currentResponseStatus;
             } else {
                 System.out.println("ERROR: " + httpURLConnection.getResponseMessage());
 
@@ -189,12 +215,7 @@ public class ServerProxy {
                 PersonResponse personResponse = gson.fromJson(peopleJson, PersonResponse.class);
 
                 for (Person currentPerson : personResponse.getData()) {
-                    DataCache.getInstance().getFamilyPeople().put(currentPerson.getPersonID(), currentPerson);
-                    if (!DataCache.getInstance().getUserFamily().containsKey(currentPerson.getAssociatedUsername())) {
-                        List<Person> personList = new ArrayList<>();
-                        DataCache.getInstance().getUserFamily().put(currentPerson.getAssociatedUsername(), personList);
-                    }
-                    DataCache.getInstance().getUserFamily().get(currentPerson.getAssociatedUsername()).add(currentPerson);
+                    DataCache.getInstance().getPersonMap().put(currentPerson.getPersonID(), currentPerson);
                 }
 
                 return true;
@@ -202,8 +223,10 @@ public class ServerProxy {
                 System.out.println("ERROR: " + httpURLConnection.getResponseMessage());
                 // Get the error stream containing the HTTP response body (if any)
                 InputStream respBody = httpURLConnection.getErrorStream();
+
                 // Extract data from the HTTP response body
                 String respData = readString(respBody);
+
                 // Display the data returned from the server
                 System.out.println(respData);
                 return false;
@@ -238,11 +261,11 @@ public class ServerProxy {
 
                 for (Event currentEvent : eventResponse.getData()) {
                     DataCache.getInstance().getEvents().put(currentEvent.getEventID(), currentEvent);
-                    if (!(DataCache.getInstance().getPersonEvents().containsKey(currentEvent.getPersonID()))) {
+                    if (!(DataCache.getInstance().getEventsOfPerson().containsKey(currentEvent.getPersonID()))) {
                         List<Event> userEvents = new ArrayList<>();
-                        DataCache.getInstance().getPersonEvents().put(currentEvent.getPersonID(), userEvents);
+                        DataCache.getInstance().getEventsOfPerson().put(currentEvent.getPersonID(), userEvents);
                     }
-                    DataCache.getInstance().getPersonEvents().get(currentEvent.getPersonID()).add(currentEvent);
+                    DataCache.getInstance().getEventsOfPerson().get(currentEvent.getPersonID()).add(currentEvent);
                 }
                 return true;
             } else {
@@ -285,8 +308,9 @@ public class ServerProxy {
         sw.flush();
     }
 
+    //Function that simple finds a Person by their ID
     private static Person getPersonViaID(String personID) {
-        return DataCache.getInstance().getFamilyPeople().get(personID);
+        return DataCache.getInstance().getPersonMap().get(personID);
     }
 
 }
