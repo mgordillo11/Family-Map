@@ -35,7 +35,7 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 DataCache.getInstance().userLoggedIn = false;
-                DataCache.getInstance().resetSettings();
+                DataCache.getInstance().resetCacheData();
                 Intent logoutIntent = new Intent(SettingsActivity.this, MainActivity.class);
                 startActivity(logoutIntent);
             }

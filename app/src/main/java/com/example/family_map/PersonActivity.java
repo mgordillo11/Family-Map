@@ -41,7 +41,7 @@ public class PersonActivity extends AppCompatActivity {
         ExpandableListView lifeEvents = findViewById(R.id.expandableLifeEvents);
 
         String personID = getIntent().getStringExtra("personID");
-        Person personMarker = DataCache.getInstance().getPersonMap().get(personID);
+        Person personMarker = DataCache.getInstance().getFamilyPersonTree().get(personID);
 
         List<Event> eventsSettings = DataCache.getInstance().getEventsBySettings();
         List<Event> currentPersonEvents = DataCache.getInstance().getEventsOfPerson()
@@ -60,21 +60,21 @@ public class PersonActivity extends AppCompatActivity {
         List<Pair<String, Person>> familyTree = new LinkedList<>();
 
         if (personMarker.getFatherID() != null) {
-            familyTree.add(new Pair<>("Father", DataCache.getInstance().getPersonMap()
+            familyTree.add(new Pair<>("Father", DataCache.getInstance().getFamilyPersonTree()
                     .get(personMarker.getFatherID())));
         } else {
             familyTree.add(new Pair<>("Father", null));
         }
 
         if (personMarker.getMotherID() != null) {
-            familyTree.add(new Pair<>("Mother", DataCache.getInstance().getPersonMap()
+            familyTree.add(new Pair<>("Mother", DataCache.getInstance().getFamilyPersonTree()
                     .get(personMarker.getMotherID())));
         } else {
             familyTree.add(new Pair<>("Mother", null));
         }
 
         if (personMarker.getSpouseID() != null) {
-            familyTree.add(new Pair<>("Spouse", DataCache.getInstance().getPersonMap()
+            familyTree.add(new Pair<>("Spouse", DataCache.getInstance().getFamilyPersonTree()
                     .get(personMarker.getSpouseID())));
         }
 

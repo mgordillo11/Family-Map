@@ -152,7 +152,7 @@ public class SearchActivity extends AppCompatActivity {
 
         private void bind(Event event) {
             this.currentEvent = event;
-            Person currentPerson = DataCache.getInstance().getPersonMap().get(event.getPersonID());
+            Person currentPerson = DataCache.getInstance().getFamilyPersonTree().get(event.getPersonID());
 
             String eventItemText = currentEvent.getEventType().toUpperCase() + ": "
                     + currentEvent.getCity() + "," + currentEvent.getCountry()

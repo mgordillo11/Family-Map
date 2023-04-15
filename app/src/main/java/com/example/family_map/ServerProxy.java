@@ -63,7 +63,7 @@ public class ServerProxy {
 
                 //Populates both lists based on if the event was associated with a male or female
                 for (Map.Entry<String, Event> recentLoadedEvent : DataCache.getInstance().getEvents().entrySet()) {
-                    Person checkGenderEvent = DataCache.getInstance().getPersonMap()
+                    Person checkGenderEvent = DataCache.getInstance().getFamilyPersonTree()
                             .get(recentLoadedEvent.getValue().getPersonID());
 
                     if (checkGenderEvent.getGender().equals("m")) {
@@ -76,10 +76,10 @@ public class ServerProxy {
                 DataCache.getInstance().setCurrentPerson(getPersonViaID(registerResponse.getPersonID()));
 
                 //Populates the mother side of the current user
-                Person currentUserMother = DataCache.getInstance().getPersonMap().
+                Person currentUserMother = DataCache.getInstance().getFamilyPersonTree().
                         get(DataCache.getInstance().getCurrentPerson().getMotherID());
 
-                Person currentUserFather = DataCache.getInstance().getPersonMap().
+                Person currentUserFather = DataCache.getInstance().getFamilyPersonTree().
                         get(DataCache.getInstance().getCurrentPerson().getFatherID());
 
                 //Populates the mother side of the current user
@@ -145,7 +145,7 @@ public class ServerProxy {
                         DataCache.getInstance().getCurrentAuthtoken());
 
                 for (Map.Entry<String, Event> recentLoadedEvent : DataCache.getInstance().getEvents().entrySet()) {
-                    Person checkGenderEvent = DataCache.getInstance().getPersonMap()
+                    Person checkGenderEvent = DataCache.getInstance().getFamilyPersonTree()
                             .get(recentLoadedEvent.getValue().getPersonID());
 
                     if (checkGenderEvent.getGender().equals("m")) {
@@ -158,10 +158,10 @@ public class ServerProxy {
                 DataCache.getInstance().setCurrentPerson(getPersonViaID(loginResponse.getPersonID()));
 
                 //Populates the mother side of the current user
-                Person currentUserMother = DataCache.getInstance().getPersonMap().
+                Person currentUserMother = DataCache.getInstance().getFamilyPersonTree().
                         get(DataCache.getInstance().getCurrentPerson().getMotherID());
 
-                Person currentUserFather = DataCache.getInstance().getPersonMap().
+                Person currentUserFather = DataCache.getInstance().getFamilyPersonTree().
                         get(DataCache.getInstance().getCurrentPerson().getFatherID());
 
                 //Populates the mother side of the current user
@@ -215,7 +215,7 @@ public class ServerProxy {
                 PersonResponse personResponse = gson.fromJson(peopleJson, PersonResponse.class);
 
                 for (Person currentPerson : personResponse.getData()) {
-                    DataCache.getInstance().getPersonMap().put(currentPerson.getPersonID(), currentPerson);
+                    DataCache.getInstance().getFamilyPersonTree().put(currentPerson.getPersonID(), currentPerson);
                 }
 
                 return true;
@@ -310,7 +310,7 @@ public class ServerProxy {
 
     //Function that simple finds a Person by their ID
     private static Person getPersonViaID(String personID) {
-        return DataCache.getInstance().getPersonMap().get(personID);
+        return DataCache.getInstance().getFamilyPersonTree().get(personID);
     }
 
 }
